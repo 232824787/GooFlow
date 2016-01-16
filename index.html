@@ -3,8 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
+    <style>
+        * {
+            cursor: default;
+        }
+
+        .master {
+            width: 960px;
+            height: 540px;
+            margin: 0 auto;
+            overflow: scroll;
+        }
+
+        .topBar {
+            width: 960px;
+            height: 40px;
+            margin: 0 auto;
+            background: deepskyblue;
+        }
+
+        .toolButtons {
+            cursor: default;
+        }
+
+        .toolButtons .btn:first-child {
+            margin-left: 10px;
+        }
+
+        .toolButtons .btn {
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+            margin-left: 5px;
+            margin-top: 5px;
+            background: #eeeeee;
+        }
+
+        .drawPanel {
+            width: 4000px;
+            height: 3000px;
+            /*border: 1px solid;*/
+            position: relative;
+            background: #eee;
+        }
+
+        .node {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: red;
+            position: absolute;
+        }
+
+        .nodeLabel {
+            width: 60px;
+            text-align: center;
+            height: auto;
+            font-size: 12px;
+            position: absolute;
+            top: 35px;
+            left: -15px;
+            word-wrap: break-word;
+            cursor: default;
+        }
+
+        .labelEdit {
+            position: absolute;
+        }
+
+        .closeBtn {
+            width: 8px;
+            height: 8px;
+            padding: 4px;
+            background: blue;
+            position: absolute;
+            top: -10px;
+            left: 35px;
+            cursor: pointer;
+        }
+    </style>
+    <script src="jquery-1.12.0.js"></script>
+    <script>
+        var nodeType = ['startNode', 'endNode', 'manNode', 'workNode'];
+        var nodeTypeId = 0;
+        var addNodeLock = true;
+        var nodeId = 1;
+        function addNode(e, obj) {
+            if (addNodeLock) {
+                return false;
+            }
+//            var isSelect = false;
+            var node = document.createElement('div');
+            var closeBtn = $("<div class='closeBtn'>");
+            var nodeLabel = $('<div class="nodeLabel" >');
+            $(node).attr('id', 'node' + nodeId);
+            nodeLabel.html('node' + nodeId++);
+            var isSelected = false;
+            var isMove = false;
+            node.className = 'node ' + nodeType[nodeTypeId];
+            node.addEventListener('mousedown', function () {
+                isMove = true;
+                var that = this;
+                $(document).mousemove(function (e) {
+                    if (isMove && addNodeLock) {
+                        $(that).css({
+                            left: e.pageX - $(obj).offset().left - 15,
+                            top: e.pageY - $(obj).offset().top - 15
+                        });
+                    }
+
+                })
+                $(document).mouseup(function () {
+                    isSelected = true;
+                    isMove = false;
+                })
+            })
+            node.addEventListener('click', function () {
+                var that = this;
+//                this.onclick = null;
+                closeBtn[0].onclick = function () {
+                    $(that).remove();
+                }
+                if (addNodeLock) {
+                    if (!isSelected) {
+                        $(this).append(closeBtn);
+//                        this.style.border = '1px solid black';
+                        isSelected = true;
+                    } else {
+                        console.log('11');
+                        this.style.border = "";
+                        isSelected = false;
+                        closeBtn.remove()
+                    }
+                }
+            })
+            node.style.cssText = 'top:' + (e.pageY - $(obj).offset().top - 15) + 'px;' + 'left:' + (e.pageX - $(obj).offset().left - 15) + "px;";
+            $(node).append(nodeLabel);
+            obj.appendChild(node);
+//            $(obj).append(nodeLabelEditor);
+            nodeLabel.attr('ondblclick', 'editLabel(this)');
+            nodeLabel.click(function () {
+                return false;
+            })
+
+
+        }
+        function checkTool(obj) {
+            var btn = $('.btn');
+            var btnLength = btn.length;
+            for (var i = 0; i < btnLength; i++) {
+                $(btn[i]).css('background', '');
+            }
+            $(obj).css('background', 'orange');
+        }
+        function editLabel(obj) {
+            var nodeLabelEditor = $('<input type="text" class="labelEdit" style="display: block">');
+            $(obj).append(nodeLabelEditor);
+            nodeLabelEditor[0].focus();
+            nodeLabelEditor.keypress(function (e) {
+                if (e.which == 13) {
+                    console.log($("#" + $(obj).attr('id')));
+                    $(obj).html(nodeLabelEditor[0].value);
+                    nodeLabelEditor.remove();
+                    nodeLabelEditor = null;
+                } else if (e.which == 27) {
+                    nodeLabelEditor.remove();
+                    nodeLabelEditor = null;
+                }
+            })
+            $(document).click(function () {
+                nodeLabelEditor.remove();
+                nodeLabelEditor = null;
+            })
+            nodeLabelEditor.click(function () {
+                return false;
+            })
+
+            return false;
+
+        }
+    </script>
 </head>
 <body>
+<div class="topBar">
+    <div class="toolButtons">
+        <div class="btn" onclick="checkTool(this);addNodeLock=true" style="background: orange"></div>
+        <div class="btn" onclick="checkTool(this);addNodeLock=false"></div>
+        <div class="btn" onclick="checkTool(this);addNodeLock=false"></div>
+        <div class="btn" onclick="checkTool(this);addNodeLock=false"></div>
+        <div class="btn" onclick="checkTool(this);addNodeLock=false"></div>
+        <div class="btn" onclick="checkTool(this);addNodeLock=false"></div>
+    </div>
+</div>
+<div class="master">
 
+    <div class="drawPanel" onclick="addNode(event,this)">
+        <svg class="arrowPanel" xmlns="http://www.w3.org/2000/svg" width="4000" height="3000">
+
+        </svg>
+    </div>
+</div>
 </body>
 </html>
