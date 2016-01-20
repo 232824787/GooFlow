@@ -88,6 +88,17 @@
             background-color: darkslategrey;
         }
 
+        .endNode {
+            background-color: darkred;
+        }
+
+        .workNode {
+            background-color: darkblue;
+        }
+
+        .userNode {
+            background-color: powderblue;
+        }
         .labelEditor {
             width: 60px;
             position: absolute;
@@ -106,7 +117,7 @@
         var addNodeLock = true; //节点锁，为真时锁定，不能添加节点
         var toolId = 0;
         var labelEditor = $('<input type="text" class="labelEditor">');
-
+        var nodeClass = ['', '', "startNode", 'endNode', 'workNode', 'userNode'];
 
         function drag(ev, obj) {
             if (toolId != 1) {
@@ -163,7 +174,7 @@
             })
             _nodeLabel.text('node' + id);
             _node.click(function () {
-
+                var that = this;
                 if (!isSelected) {
                     isSelected = true;
                     addNodeLock = true;
@@ -242,7 +253,7 @@
         $(document).ready(function () {
             $('.drawPanel').click(function (e) {
                 if (!addNodeLock) {
-                    node(this, 'startNode', {
+                    node(this, nodeClass[toolId], {
                         left: e.pageX - 20 - $(this).offset().left,
                         top: e.pageY - 20 - $(this).offset().top
                     })
