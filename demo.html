@@ -56,7 +56,7 @@
             height: 40px;
             border-radius: 50%;
             cursor: move;
-            box-shadow: 0px 0px 5px #666;
+            box-shadow: 0 0 5px #666;
         }
 
         .nodeLabel {
@@ -85,7 +85,7 @@
         }
 
         .startNode {
-            background-color: darkslategrey;
+            background-color: darkorange;
         }
 
         .endNode {
@@ -97,8 +97,9 @@
         }
 
         .userNode {
-            background-color: powderblue;
+            background-color: darkcyan;
         }
+
         .labelEditor {
             width: 60px;
             position: absolute;
@@ -141,18 +142,18 @@
                 _node.css({
                     top: ev.pageY - y + 2,
                     left: ev.pageX - x + 10
-                })
+                });
                 $('.drawPanel').append(_node);
             }
             return false;
         }
-        //
+        //核心函数，操作节点
         var node = function (context, typeName, point) {
-
             var _node = $('<div draggable="true" ondragstart="drag(event,this)">');
             var _nodeLabel = $('<div class="nodeLabel">');
             var _closeBtn = $('<div class="closeBtn">');
             var svg = $('svg')[0];
+            var ns = svg.namespaceURI;
             var isdrawLine = false; //是否处于画线状态
             var isSelected = false; //
             $('.drawPanel').click(function () {
@@ -169,12 +170,20 @@
             })
             _node.mousedown(function () {
                 if (toolId == 1) {
-
+                    isdrawLine = true;
+                    var tmpPath = document.createElementNS(ns, 'path');
+                    var M = 'N ' + this.style.left + ' ' + this.style.top;
+                    console.log(M);
                 }
             })
             _nodeLabel.text('node' + id);
             _node.click(function () {
                 var that = this;
+                var _nodes = $('.node');
+                for (var i = 0; i < _nodes.length; i++) {
+                    _nodes[i].style.zIndex = '100';
+                }
+                this.style.zIndex = '1000';
                 if (!isSelected) {
                     isSelected = true;
                     addNodeLock = true;
@@ -190,7 +199,6 @@
                 })
                 return false;
             })
-
             _nodeLabel.click(function () {
                 return false;
             })
@@ -217,19 +225,14 @@
                         $(this).remove();
                     }
                 })
-
                 return false;
             })
-
             _node.attr('class', 'node ' + typeName);
             _node.attr('id', 'node' + (id++))
             _node.css(point);
             _node.append(_nodeLabel);
-
             $(context).append(_node);
-
         }
-
         function checkTool(obj, id) {
             toolId = id;
             var btns = $('.btn');
@@ -241,7 +244,6 @@
         }
         function drawLine(obj, start, end, width, color) {
             var _path = document.createElementNS(obj[0].namespaceURI, 'path');
-
             $(_path).attr({
                 d: 'M ' + start[0] + ' ' + start[1] + ' L ' + end[0] + ' ' + end[1],
                 'stroke-width': width,
@@ -252,7 +254,7 @@
         }
         $(document).ready(function () {
             $('.drawPanel').click(function (e) {
-                if (!addNodeLock) {
+                if (!addNodeLock && toolId != 1) {
                     node(this, nodeClass[toolId], {
                         left: e.pageX - 20 - $(this).offset().left,
                         top: e.pageY - 20 - $(this).offset().top
