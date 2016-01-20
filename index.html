@@ -37,6 +37,9 @@
             margin-left: 5px;
             margin-top: 5px;
             background: #eeeeee;
+            font-size: 12px;
+            text-align: center;
+            line-height: 30px;
         }
 
         .drawPanel {
@@ -75,11 +78,26 @@
             width: 8px;
             height: 8px;
             padding: 4px;
-            background: blue;
             position: absolute;
             top: -10px;
             left: 35px;
             cursor: pointer;
+        }
+
+        .startNode {
+            background-color: green;
+        }
+
+        .endNode {
+            background-color: red;
+        }
+
+        .manNode {
+            background-color: blue;
+        }
+
+        .workNode {
+            background-color: darkslategrey;
         }
     </style>
     <script src="jquery-1.12.0.js"></script>
@@ -87,6 +105,7 @@
         var nodeType = ['startNode', 'endNode', 'manNode', 'workNode'];
         var nodeTypeId = 0;
         var addNodeLock = true;
+        var drawLineLock = true;
         var nodeId = 1;
         function addNode(e, obj) {
             if (addNodeLock) {
@@ -102,8 +121,12 @@
             var isMove = false;
             node.className = 'node ' + nodeType[nodeTypeId];
             node.addEventListener('mousedown', function () {
+
                 isMove = true;
                 var that = this;
+                if (drawLineLock) {
+
+                }
                 $(document).mousemove(function (e) {
                     if (isMove && addNodeLock) {
                         $(that).css({
@@ -114,28 +137,30 @@
 
                 })
                 $(document).mouseup(function () {
-                    isSelected = true;
                     isMove = false;
                 })
+                return false;
             })
             node.addEventListener('click', function () {
                 var that = this;
-//                this.onclick = null;
                 closeBtn[0].onclick = function () {
                     $(that).remove();
                 }
                 if (addNodeLock) {
                     if (!isSelected) {
                         $(this).append(closeBtn);
-//                        this.style.border = '1px solid black';
                         isSelected = true;
                     } else {
-                        console.log('11');
-                        this.style.border = "";
                         isSelected = false;
+                        console.log(isSelected);
                         closeBtn.remove()
                     }
                 }
+                closeBtn.click(function () {
+                    $(that).remove();
+                    return false;
+                })
+                return false;
             })
             node.style.cssText = 'top:' + (e.pageY - $(obj).offset().top - 15) + 'px;' + 'left:' + (e.pageX - $(obj).offset().left - 15) + "px;";
             $(node).append(nodeLabel);
@@ -182,17 +207,23 @@
             return false;
 
         }
+        function drawLine(svg, ev) {
+            var ns = svg.namespaceURI;
+            var path = document.createElementNS();
+        }
     </script>
 </head>
 <body>
 <div class="topBar">
     <div class="toolButtons">
-        <div class="btn" onclick="checkTool(this);addNodeLock=true" style="background: orange"></div>
-        <div class="btn" onclick="checkTool(this);addNodeLock=false"></div>
-        <div class="btn" onclick="checkTool(this);addNodeLock=false"></div>
-        <div class="btn" onclick="checkTool(this);addNodeLock=false"></div>
-        <div class="btn" onclick="checkTool(this);addNodeLock=false"></div>
-        <div class="btn" onclick="checkTool(this);addNodeLock=false"></div>
+        <div class="btn" onclick="checkTool(this);addNodeLock=true;drawLineLock = true" style="background: orange">S
+        </div>
+        <div class="btn" onclick="checkTool(this);drawLineLock = false">-></div>
+        <div class="btn" onclick="checkTool(this);addNodeLock=false;nodeTypeId=0;drawLineLock = true">SD</div>
+        <div class="btn" onclick="checkTool(this);addNodeLock=false;nodeTypeId=1;drawLineLock = true">NS</div>
+        <div class="btn" onclick="checkTool(this);addNodeLock=false;nodeTypeId=2;drawLineLock = true">NE</div>
+        <div class="btn" onclick="checkTool(this);addNodeLock=false;nodeTypeId=3;drawLineLock = true">NU</div>
+        <div class="btn" onclick="checkTool(this);addNodeLock=false;nodeTypeId=4;drawLineLock = true">NW</div>
     </div>
 </div>
 <div class="master">

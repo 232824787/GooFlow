@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        * {
+            cursor: default;
+        }
+
+        .master {
+            width: 960px;
+            height: 570px;
+            margin: 0 auto;
+            box-shadow: 2px 2px 2px #ddd;
+        }
+
+        .topBar {
+            width: 100%;
+            height: 30px;
+            background-color: mediumturquoise;
+        }
+
+        .btn {
+            width: 20px;
+            height: 20px;
+            margin-top: 5px;
+            margin-left: 5px;
+            display: inline-block;
+            background-color: aqua;
+        }
+
+        .viewBox {
+            width: 100%;
+            height: 540px;
+            overflow: scroll;
+
+        }
+
+        .drawPanel {
+            width: 4000px;
+            height: 3000px;
+            position: relative;
+            background: url("img/gooflow_blank.gif");
+
+        }
+
+        .node {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: move;
+            box-shadow: 0px 0px 5px #666;
+        }
+
+        .nodeLabel {
+            width: 60px;
+            height: auto;
+            padding: 3px;
+            position: absolute;
+            top: 45px;
+            left: -13px;
+            word-wrap: normal;
+            text-align: center;
+            font-size: 12px;
+            background-color: aquamarine;
+        }
+
+        .closeBtn {
+            width: 7px;
+            height: 7px;
+            padding: 0;
+            position: absolute;
+            top: -6px;
+            left: 46px;
+            background-image: url("img/gooflow_tip.png");
+            background-position: 0 0;
+            cursor: pointer;
+        }
+
+        .startNode {
+            background-color: darkslategrey;
+        }
+
+        .labelEditor {
+            width: 60px;
+            position: absolute;
+            margin: 0;
+            top: 0;
+            left: 0;
+            padding: 0;
+            cursor: text;
+            border: 1px solid cadetblue;
+            box-shadow: 0 0 5px #333;
+        }
+    </style>
+    <script src="jquery-1.12.0.js"></script>
+    <script>
+        var id = 1; //节点id
+        var addNodeLock = true; //节点锁，为真时锁定，不能添加节点
+        var toolId = 0;
+        var labelEditor = $('<input type="text" class="labelEditor">');
+
+
+        function drag(ev, obj) {
+            if (toolId != 1) {
+                ev.dataTransfer.setData("Text", ev.target.id);
+                ev.dataTransfer.setData('x', ev.pageX - $(obj).offset().left + $('.drawPanel').offset().left);
+                ev.dataTransfer.setData('y', ev.pageY - $(obj).offset().top + $('.drawPanel').offset().top);
+            }
+        }
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.returnValue = false;
+        }
+        function drop(ev) {
+            ev.preventDefault();
+            ev.returnValue = false;
+            if (toolId != 1) {
+                var data = ev.dataTransfer.getData("Text");
+                var x = ev.dataTransfer.getData('x');
+                var y = ev.dataTransfer.getData('y');
+                var _node = $(document.getElementById(data));
+                _node.css({
+                    top: ev.pageY - y + 2,
+                    left: ev.pageX - x + 10
+                })
+                $('.drawPanel').append(_node);
+            }
+            return false;
+        }
+        //
+        var node = function (context, typeName, point) {
+
+            var _node = $('<div draggable="true" ondragstart="drag(event,this)">');
+            var _nodeLabel = $('<div class="nodeLabel">');
+            var _closeBtn = $('<div class="closeBtn">');
+            var svg = $('svg')[0];
+            var isdrawLine = false; //是否处于画线状态
+            var isSelected = false; //
+            $('.drawPanel').click(function () {
+                if (addNodeLock) {
+                    var _closeBtns = $('.closeBtn') || [];
+                    for (var i = 0; i < _closeBtns.length; i++) {
+                        $(_closeBtns[i]).remove();
+                    }
+                    labelEditor.remove();
+
+                    isSelected = false;
+                    addNodeLock = false;
+                }
+            })
+            _node.mousedown(function () {
+                if (toolId == 1) {
+
+                }
+            })
+            _nodeLabel.text('node' + id);
+            _node.click(function () {
+
+                if (!isSelected) {
+                    isSelected = true;
+                    addNodeLock = true;
+                    _node.append(_closeBtn);
+                } else {
+                    isSelected = false;
+                    _closeBtn.remove();
+                }
+                _closeBtn.click(function () {
+                    addNodeLock = false;
+                    $(that).remove();
+                    return false;
+                })
+                return false;
+            })
+
+            _nodeLabel.click(function () {
+                return false;
+            })
+            _nodeLabel.dblclick(function () {
+                addNodeLock = true;
+                var tmp = $(this).text();
+                var that = this;
+
+                labelEditor.val($(this).text());
+//                $(this).text("");
+                $(this).append(labelEditor);
+                labelEditor[0].focus();
+                labelEditor[0].select();
+                labelEditor.keydown(function (e) {
+//                    console.log(this);
+                    if (e.which == 13) {
+                        addNodeLock = false;
+                        $(that).text($(this).val());
+                        $(this).remove();
+                    }
+                    if (e.which == 27) {
+                        addNodeLock = false;
+//                        $(that).text(tmp);
+                        $(this).remove();
+                    }
+                })
+
+                return false;
+            })
+
+            _node.attr('class', 'node ' + typeName);
+            _node.attr('id', 'node' + (id++))
+            _node.css(point);
+            _node.append(_nodeLabel);
+
+            $(context).append(_node);
+
+        }
+
+        function checkTool(obj, id) {
+            toolId = id;
+            var btns = $('.btn');
+            var length = btns.length;
+            for (var i = 0; i < length; i++) {
+                $(btns).css('background-color', "");
+            }
+            $(obj).css('background-color', 'darkgray');
+        }
+        function drawLine(obj, start, end, width, color) {
+            var _path = document.createElementNS(obj[0].namespaceURI, 'path');
+
+            $(_path).attr({
+                d: 'M ' + start[0] + ' ' + start[1] + ' L ' + end[0] + ' ' + end[1],
+                'stroke-width': width,
+                'fill': 'none',
+                'stroke': color
+            });
+            obj[0].appendChild(_path);
+        }
+        $(document).ready(function () {
+            $('.drawPanel').click(function (e) {
+                if (!addNodeLock) {
+                    node(this, 'startNode', {
+                        left: e.pageX - 20 - $(this).offset().left,
+                        top: e.pageY - 20 - $(this).offset().top
+                    })
+                }
+//                drawLine(svg, [100, 200], [400, 322], 3, '#333');
+            })
+        })
+    </script>
+</head>
+<body>
+<div class="master">
+    <div class="topBar">
+        <div class="btn" onclick="checkTool(this,0);addNodeLock = true" style="background-color: darkgray"></div>
+        <div class="btn" onclick="checkTool(this,1);addNodeLock = true"></div>
+        <div class="btn" onclick="checkTool(this,2);addNodeLock = false"></div>
+        <div class="btn" onclick="checkTool(this,3);addNodeLock = false"></div>
+        <div class="btn" onclick="checkTool(this,4);addNodeLock = false"></div>
+        <div class="btn" onclick="checkTool(this,5);addNodeLock = false"></div>
+    </div>
+    <div class="viewBox">
+        <div class="drawPanel" draggable="false" ondragover="allowDrop(event)" ondrop="drop(event)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="4000" height="3000"></svg>
+        </div>
+    </div>
+</div>
+</body>
+</html>
