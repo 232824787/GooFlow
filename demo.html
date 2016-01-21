@@ -33,8 +33,17 @@
             margin-left: 5px;
             display: inline-block;
             background-color: aqua;
+            color: black;
+            font-size: 16px;
+            line-height: 20px;
+            text-align: center;
         }
 
+        .btn:nth-child(3) {
+            margin-left: 20px;
+        }
+
+        .nth
         .viewBox {
             width: 100%;
             height: 540px;
@@ -57,8 +66,13 @@
             border-radius: 50%;
             cursor: move;
             box-shadow: 0 0 5px #666;
+            text-align: center;
         }
 
+        .node i {
+            font-size: 24px;
+            line-height: 38px;
+        }
         .nodeLabel {
             width: 60px;
             height: auto;
@@ -69,9 +83,9 @@
             word-wrap: normal;
             text-align: center;
             font-size: 12px;
-            background-color: aquamarine;
+            background-color: rgba(100, 100, 100, 0.2);
+            color: #333333;
         }
-
         .closeBtn {
             width: 7px;
             height: 7px;
@@ -86,18 +100,21 @@
 
         .startNode {
             background-color: darkorange;
+            color: blueviolet;
         }
-
         .endNode {
             background-color: darkred;
+            color: burlywood;
         }
 
         .workNode {
             background-color: darkblue;
+            color: chartreuse;
         }
 
         .userNode {
-            background-color: darkcyan;
+            background-color: #dddddd;
+            color: red;
         }
 
         .labelEditor {
@@ -111,15 +128,30 @@
             border: 1px solid cadetblue;
             box-shadow: 0 0 5px #333;
         }
+
+        g {
+            padding: 10px;
+            display: block;
+            min-width: 20px;
+            min-height: 20px;
+        }
     </style>
+    <link rel="stylesheet" href="iconfont/iconfont.css"/>
     <script src="jquery-1.12.0.js"></script>
     <script>
         var id = 1; //节点id
         var addNodeLock = true; //节点锁，为真时锁定，不能添加节点
-        var toolId = 0;
-        var labelEditor = $('<input type="text" class="labelEditor">');
-        var nodeClass = ['', '', "startNode", 'endNode', 'workNode', 'userNode'];
+        var isdrawLine = false; //是否处于画线状态
+        var isDropLine = false; //是否可以确定线段
+        var endPoint = ''//线段终点
+        var toolId = 0;//工具id
+        var labelEditor = $('<input type="text" class="labelEditor">');//节点重命名输入框
 
+        var nodeClass = ['', '', "startNode", 'endNode', 'workNode', 'userNode'];//节点类型
+        var nodeIcon = ['', '', 'icon-bofangqibofang', 'icon-shezhi', 'icon-yonghu', 'icon-tingzhi'];
+        /*
+         拖动节点
+         */
         function drag(ev, obj) {
             if (toolId != 1) {
                 ev.dataTransfer.setData("Text", ev.target.id);
@@ -143,58 +175,62 @@
                     top: ev.pageY - y + 2,
                     left: ev.pageX - x + 10
                 });
-                $('.drawPanel').append(_node);
+
+                $('drawPanel').append(_node);
+
             }
             return false;
+
         }
+        /*
+         拖动节点-end
+         */
         //核心函数，操作节点
         var node = function (context, typeName, point) {
-            var _node = $('<div draggable="true" ondragstart="drag(event,this)">');
-            var _nodeLabel = $('<div class="nodeLabel">');
-            var _closeBtn = $('<div class="closeBtn">');
+            var _node = $('<div draggable="true" ondragstart="drag(event,this)"><i class=""></i>');//节点dom
+            var _nodeLabel = $('<div class="nodeLabel">');//标签dom
+            var _closeBtn = $('<div class="closeBtn">'); //删除节点按钮dom
             var svg = $('svg')[0];
-            var ns = svg.namespaceURI;
-            var isDropLine = false; //是否可以确定线段
-            var isdrawLine = false; //是否处于画线状态
-            var isSelected = false; //
-            $('.drawPanel').click(function () {
+            var _icon = _node.children('i');
+            _icon[0].className = 'iconfont ' + nodeIcon[toolId];
+            var ns = svg.namespaceURI; //获取svg命名空间
+            var isSelected = false; //节点是否被选中
+            $('.drawPanel').click(function () { //点击空白处，清除对节点的状态
                 if (addNodeLock) {
                     var _closeBtns = $('.closeBtn') || [];
                     for (var i = 0; i < _closeBtns.length; i++) {
                         $(_closeBtns[i]).remove();
                     }
                     labelEditor.remove();
-
                     isSelected = false;
                     addNodeLock = false;
                 }
             })
-            _node.mouseover(function () {
-                if (toolId == 1 && 1) {
-                    isDropLine = true;
-                    console.log(isDropLine);
+            _node.mouseover(function () { //当鼠标进入节点内部时
+                if (toolId == 1 && isdrawLine) {
+                    isDropLine = true;//可以确定线段
+                    endPoint = ' L ' + (parseInt(this.style.left) + 20) + ' ' + (parseInt(this.style.top) + 20);//确定线段终点
                 }
                 return false;
             })
-            _node.mouseout(function () {
-                if (toolId == 1 && 1) {
-                    isDropLine = false;
-                    console.log(isDropLine)
+            _node.mouseout(function () { //当鼠标离开节点时
+                if (toolId == 1 && isdrawLine) {
+                    isDropLine = false; //不可以确定线段
                 }
                 return false;
             })
             _node.mousedown(function () {
                 var that = this;
                 var M = '', L = '';
-                var tmpPath = {};
-
-
+                var tmpPath = {};//临时线段，方便使用者确定线段的位置
                 if (toolId == 1) {
                     isdrawLine = true;
-                    this.draggable = false;
+                    this.draggable = false;//节点不可以拖动
                     tmpPath = document.createElementNS(ns, 'path');
                     M = 'M ' + (parseInt(this.style.left) + 20) + ' ' + (parseInt(this.style.top) + 20);
                     $(svg).append($(tmpPath));
+                } else {
+
                 }
                 $(document).mousemove(function (e) {
                     if (isdrawLine) {
@@ -207,26 +243,31 @@
                         });
                     }
                 })
-                $(document).mouseup(function () {
+                $('.drawPanel').mouseup(function () {
                     isdrawLine = false;
-                    that.draggable = true;
                     if (isDropLine) {
-                        console.log(1);
-                        drawLine($(svg), M + L, 2, 'red');
-
+                        drawLine($(svg), M + endPoint, 2, 'red');
+                    } else {
+                        that.draggable = true;
                     }
                     $(tmpPath).remove();
-
+                    $(this).unbind('mouseup');
                 })
             })
-            _nodeLabel.text('node' + id);
+            _nodeLabel.text('node' + id); //设定节点初始名称
             _node.click(function () {
                 var that = this;
                 var _nodes = $('.node');
+                /*
+                 将选定的节点位置最前，其他则最后
+                 */
                 for (var i = 0; i < _nodes.length; i++) {
                     _nodes[i].style.zIndex = '100';
                 }
                 this.style.zIndex = '1000';
+                /*
+                 决定删除按钮是否出现
+                 */
                 if (!isSelected) {
                     isSelected = true;
                     addNodeLock = true;
@@ -235,6 +276,7 @@
                     isSelected = false;
                     _closeBtn.remove();
                 }
+                //删除节点
                 _closeBtn.click(function () {
                     addNodeLock = false;
                     $(that).remove();
@@ -245,18 +287,16 @@
             _nodeLabel.click(function () {
                 return false;
             })
+            //双击节点标签重命名节点
             _nodeLabel.dblclick(function () {
                 addNodeLock = true;
                 var tmp = $(this).text();
                 var that = this;
-
                 labelEditor.val($(this).text());
-//                $(this).text("");
                 $(this).append(labelEditor);
                 labelEditor[0].focus();
                 labelEditor[0].select();
                 labelEditor.keydown(function (e) {
-//                    console.log(this);
                     if (e.which == 13) {
                         addNodeLock = false;
                         $(that).text($(this).val());
@@ -286,14 +326,70 @@
             $(obj).css('background-color', 'darkgray');
         }
         function drawLine(obj, d, width, color) {
+            var isSelected = false;
+            var _g = document.createElementNS(obj[0].namespaceURI, 'g');
             var _path = document.createElementNS(obj[0].namespaceURI, 'path');
+            var _arrow = document.createElementNS(obj[0].namespaceURI, 'path');
+            var _closeBtn = $('<div class="closeBtn">');
+            var data = d.split(' ');
+            if (data[1] == data[4] && data[2] == data[5]) {
+                return false;
+            }
+            $(_arrow).attr({
+                d: getArrowPath(parseInt(data[1]), parseInt(data[2]), parseInt(data[4]), parseInt(data[5]), 18),
+                fill: color,
+                'stroke-width': 0
+            })
             $(_path).attr({
                 d: d,
                 'stroke-width': width,
                 'fill': 'none',
                 'stroke': color
             });
-            obj[0].appendChild(_path);
+            obj[0].appendChild(_g);
+            _g.appendChild(_arrow);
+            _g.appendChild(_path);
+
+            $(_g).click(function (e) {
+                var that = this;
+                if (toolId != 1) {
+                    if (!isSelected) {
+                        _closeBtn.css({
+                            'pading': '2px 4px',
+                            'background-color': 'rgba(100,100,100,0)',
+                            'top': e.pageY - $('.drawPanel').offset().top - 10,
+                            'left': e.pageX - $('.drawPanel').offset().left + 15
+                        })
+                        $('.drawPanel').append(_closeBtn)
+                        _closeBtn.click(function () {
+                            $(that).remove();
+                            $(this).remove();
+                            addNodeLock = true;
+                            return false;
+                        })
+                        isSelected = true;
+
+                    }
+                    else {
+                        _closeBtn.remove();
+                        isSelected = false;
+                    }
+                }
+                return false;
+            })
+        }
+        function getArrowPath(startX, startY, endX, endY, circleR) { //绘制箭头
+            var arrowRadius = circleR;
+            var tmpx = endX - startX;
+            var tmpy = startY - endY;
+            var angle = Math.atan2(tmpy, tmpx) * (180 / Math.PI);
+            var centerX = endX - arrowRadius * Math.cos(angle * (Math.PI / 180));
+            var centerY = endY + arrowRadius * Math.sin(angle * (Math.PI / 180));
+            var leftX = centerX + arrowRadius * Math.cos((angle + 165) * (Math.PI / 180));
+            var leftY = centerY - arrowRadius * Math.sin((angle + 165) * (Math.PI / 180));
+            var rightX = centerX + arrowRadius * Math.cos((angle + 195) * (Math.PI / 180));
+            var rightY = centerY - arrowRadius * Math.sin((angle + 195) * (Math.PI / 180));
+            return "M" + leftX + "," + leftY + " L" + centerX + "," + centerY + " L" + rightX + "," + rightY + " z";
         }
         $(document).ready(function () {
             $('.drawPanel').click(function (e) {
@@ -311,12 +407,14 @@
 <body>
 <div class="master">
     <div class="topBar">
-        <div class="btn" onclick="checkTool(this,0);addNodeLock = true" style="background-color: darkgray"></div>
-        <div class="btn" onclick="checkTool(this,1);addNodeLock = true"></div>
-        <div class="btn" onclick="checkTool(this,2);addNodeLock = false"></div>
-        <div class="btn" onclick="checkTool(this,3);addNodeLock = false"></div>
-        <div class="btn" onclick="checkTool(this,4);addNodeLock = false"></div>
-        <div class="btn" onclick="checkTool(this,5);addNodeLock = false"></div>
+        <div class="btn" onclick="checkTool(this,0);addNodeLock = true" style="background-color: darkgray"><i
+                class="iconfont icon-shubiao"></i></div>
+        <div class="btn" onclick="checkTool(this,1);addNodeLock = true"><i class="iconfont icon-jiantou"></i></div>
+        <div class="btn" onclick="checkTool(this,2);addNodeLock = false"><i class="iconfont icon-bofangqibofang"></i>
+        </div>
+        <div class="btn" onclick="checkTool(this,3);addNodeLock = false"><i class="iconfont icon-shezhi"></i></div>
+        <div class="btn" onclick="checkTool(this,4);addNodeLock = false"><i class="iconfont icon-yonghu"></i></div>
+        <div class="btn" onclick="checkTool(this,5);addNodeLock = false"><i class="iconfont icon-tingzhi"></i></div>
     </div>
     <div class="viewBox">
         <div class="drawPanel" draggable="false" ondragover="allowDrop(event)" ondrop="drop(event)">
