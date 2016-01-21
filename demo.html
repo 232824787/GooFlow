@@ -154,6 +154,7 @@
             var _closeBtn = $('<div class="closeBtn">');
             var svg = $('svg')[0];
             var ns = svg.namespaceURI;
+            var isDropLine = false; //是否可以确定线段
             var isdrawLine = false; //是否处于画线状态
             var isSelected = false; //
             $('.drawPanel').click(function () {
@@ -168,13 +169,55 @@
                     addNodeLock = false;
                 }
             })
+            _node.mouseover(function () {
+                if (toolId == 1 && 1) {
+                    isDropLine = true;
+                    console.log(isDropLine);
+                }
+                return false;
+            })
+            _node.mouseout(function () {
+                if (toolId == 1 && 1) {
+                    isDropLine = false;
+                    console.log(isDropLine)
+                }
+                return false;
+            })
             _node.mousedown(function () {
+                var that = this;
+                var M = '', L = '';
+                var tmpPath = {};
+
+
                 if (toolId == 1) {
                     isdrawLine = true;
-                    var tmpPath = document.createElementNS(ns, 'path');
-                    var M = 'N ' + this.style.left + ' ' + this.style.top;
-                    console.log(M);
+                    this.draggable = false;
+                    tmpPath = document.createElementNS(ns, 'path');
+                    M = 'M ' + (parseInt(this.style.left) + 20) + ' ' + (parseInt(this.style.top) + 20);
+                    $(svg).append($(tmpPath));
                 }
+                $(document).mousemove(function (e) {
+                    if (isdrawLine) {
+                        L = ' L ' + (e.pageX - $(svg).offset().left) + " " + (e.pageY - $(svg).offset().top);
+                        $(tmpPath).attr({
+                            d: M + L,
+                            'stroke': '#cbb',
+                            'stroke-width': 2,
+                            'fill': 'none'
+                        });
+                    }
+                })
+                $(document).mouseup(function () {
+                    isdrawLine = false;
+                    that.draggable = true;
+                    if (isDropLine) {
+                        console.log(1);
+                        drawLine($(svg), M + L, 2, 'red');
+
+                    }
+                    $(tmpPath).remove();
+
+                })
             })
             _nodeLabel.text('node' + id);
             _node.click(function () {
@@ -242,10 +285,10 @@
             }
             $(obj).css('background-color', 'darkgray');
         }
-        function drawLine(obj, start, end, width, color) {
+        function drawLine(obj, d, width, color) {
             var _path = document.createElementNS(obj[0].namespaceURI, 'path');
             $(_path).attr({
-                d: 'M ' + start[0] + ' ' + start[1] + ' L ' + end[0] + ' ' + end[1],
+                d: d,
                 'stroke-width': width,
                 'fill': 'none',
                 'stroke': color
