@@ -57,7 +57,8 @@ function GooFlow(bgDiv, property) {
                     case "icon_new":
                         if (This.onBtnNewClick != null) This.onBtnNewClick();
                         break;
-                    case
+                    case '':
+                        ;
                 }
             });
         }
