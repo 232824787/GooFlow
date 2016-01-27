@@ -1,8 +1,4 @@
-//定义一个区域图类：
 function GooFlow(bgDiv, property) {
-    if (navigator.userAgent.indexOf("MSIE 8.0") > 0 || navigator.userAgent.indexOf("MSIE 7.0") > 0 || navigator.userAgent.indexOf("MSIE 6.0") > 0)
-        GooFlow.prototype.useSVG = "";
-    else    GooFlow.prototype.useSVG = "1";
 //初始化区域图的对象
     this.$id = bgDiv.attr("id");
     this.$bgDiv = bgDiv;//最父框架的DIV
@@ -63,7 +59,7 @@ function GooFlow(bgDiv, property) {
                 else if (tar.tagName == "a")    tar = tar.childNode[0];
                 var This = e.data.inthis;
                 //定义顶部操作栏按钮的事件
-                switch ($(tar).attr("class")) {
+                switch ($(tar).attr("class").split(" ")[1]) {
                     case "ico_new":
                         if (This.onBtnNewClick != null)    This.onBtnNewClick();
                         break;
@@ -416,7 +412,7 @@ function GooFlow(bgDiv, property) {
     }
 }
 GooFlow.prototype = {
-    useSVG: "",
+    useSVG: "1",
     getSvgMarker: function (id, color) {
         var m = document.createElementNS("http://www.w3.org/2000/svg", "marker");
         m.setAttribute("id", id);
@@ -730,7 +726,7 @@ GooFlow.prototype = {
             if (!json.left || json.left < 0)json.left = 0;
             var hack = 0;
             if (navigator.userAgent.indexOf("8.0") != -1)    hack = 2;
-            this.$nodeDom[id] = $("<div class='GooFlow_item" + mark + "' id='" + id + "' style='top:" + json.top + "px;left:" + json.left + "px'><table cellspacing='1' style='width:" + (json.width - 2) + "px;height:" + (json.height - 2) + "px;'><tr><td class='ico'><b class='ico_" + json.type + "'></b></td><td>" + json.name + "</td></tr></table><div style='display:none'><div class='rs_bottom'></div><div class='rs_right'></div><div class='rs_rb'></div><div class='rs_close'></div></div></div>");
+            this.$nodeDom[id] = $("<div class='GooFlow_item item_round" + mark + "' id='" + id + "' style='top:" + json.top + "px;left:" + json.left + "px'><table cellspacing='1' style='width:" + (json.width - 2) + "px;height:" + (json.height - 2) + "px;'><tr><td class='ico'><b class='ico_" + json.type + "'></b></td><td class='span'>" + json.name + "</td></tr></table><div style='display:none'><div class='rs_bottom'></div><div class='rs_right'></div><div class='rs_rb'></div><div class='rs_close'></div></div></div>");
             if (json.type.indexOf(" mix") > -1)    this.$nodeDom[id].addClass("item_mix");
         }
         else {
@@ -870,8 +866,8 @@ GooFlow.prototype = {
             var t = getElCoordinate(This.$workArea[0]);
             This.$textArea.val(oldTxt).css({
                 display: "block", width: $(this).width() + 24, height: $(this).height(),
-                left: t.left + 24 + This.$nodeData[id].left - This.$workArea[0].parentNode.scrollLeft,
-                top: t.top + 2 + This.$nodeData[id].top - This.$workArea[0].parentNode.scrollTop
+                left: t.left - 10 + This.$nodeData[id].left - This.$workArea[0].parentNode.scrollLeft,
+                top: t.top + 26 + This.$nodeData[id].top - This.$workArea[0].parentNode.scrollTop
             })
                 .data("id", This.$focus).focus();
             This.$workArea.parent().one("mousedown", function (e) {

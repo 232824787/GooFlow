@@ -1,0 +1,73 @@
+@font-face {
+    font-family: "iconfont";
+    src: url('iconfont.eot'); /* IE9*/
+    src: url('iconfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */ url('iconfont.woff') format('woff'), /* chrome, firefox */ url('iconfont.ttf') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/ url('iconfont.svg#iconfont') format('svg'); /* iOS 4.1- */
+}
+
+.GooFlow b {
+    font-family: "iconfont" !important;
+    font-size: 16px;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: 0.2px;
+    -moz-osx-font-smoothing: grayscale;
+    color: #333;
+    /*background-image: inherit !important;*/
+    text-align: center;
+}
+
+.ico_new:before {
+    content: "\e608";
+}
+
+.icon-baocun:before {
+    content: "\e878";
+}
+
+.icon-dakai:before {
+    content: "\e65b";
+}
+
+.icon-chexiao:before {
+    content: "\e61c";
+}
+
+.icon-huifu:before {
+    content: "\e615";
+}
+
+.icon-shuaxin:before {
+    content: "\e6aa";
+}
+
+.ico_direct {
+    font-size: 12px !important;
+}
+
+.ico_cursor:before {
+    content: "\e81b";
+}
+
+.ico_direct:before {
+    content: "\e630";
+}
+
+.ico_start:before {
+    content: "\e6dd";
+}
+
+.ico_task:before {
+    content: "\e67a";
+}
+
+.ico_end:before {
+    content: "\e66c";
+}
+
+.ico_node:before {
+    content: "\e6bd";
+}
+
+.ico_group:before {
+    content: "\e736";
+}
