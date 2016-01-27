@@ -1,6 +1,4 @@
-/**
- * Created by Alex on 2016/1/22.
- */
+//定义一个区域图类：
 function GooFlow(bgDiv, property) {
     if (navigator.userAgent.indexOf("MSIE 8.0") > 0 || navigator.userAgent.indexOf("MSIE 7.0") > 0 || navigator.userAgent.indexOf("MSIE 6.0") > 0)
         GooFlow.prototype.useSVG = "";
@@ -43,8 +41,18 @@ function GooFlow(bgDiv, property) {
         this.$bgDiv.append(this.$head);
         headHeight = 24;
         //以下是当工具栏按钮被点击时触发的事件自定义(虚函数),格式为function(),因为可直接用THIS操作对象本身,不用传参；用户可自行重定义:
-        this.onBtnNewClick = null;//新建流程图按钮被点中
-        this.onBtnOpenClick = null;//打开流程图按钮定义
+        this.onBtnNewClick = function () { //新建
+            var title = prompt(ch('输入新的名称：'), '');
+            if (title != null) {
+                this.setTitle(title);
+            }
+        }
+        this.onBtnOpenClick = function () { //打开
+            var WshShell = new ActiveXObject("WScript.Shell");
+            file_input_obj.focus();
+            file_input_obj.createTextRange().select();
+            WshShell.SendKeys("{del}");
+        }
         this.onBtnSaveClick = null;//保存流程图按钮定义
         this.onFreshClick = null;//重载流程图按钮定义
         if (property.headBtns)
@@ -408,9 +416,9 @@ function GooFlow(bgDiv, property) {
     }
 }
 GooFlow.prototype = {
-    useSvg: "",
+    useSVG: "",
     getSvgMarker: function (id, color) {
-        var m = document.createElementNS(this.ns, 'marker');
+        var m = document.createElementNS("http://www.w3.org/2000/svg", "marker");
         m.setAttribute("id", id);
         m.setAttribute("viewBox", "0 0 6 6");
         m.setAttribute("refX", 5);
@@ -419,7 +427,7 @@ GooFlow.prototype = {
         m.setAttribute("markerWidth", 6);
         m.setAttribute("markerHeight", 6);
         m.setAttribute("orient", "auto");
-        var path = document.createElementNS(this.ns, 'path');
+        var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         path.setAttribute("d", "M 0 0 L 6 3 L 0 6 z");
         path.setAttribute("fill", color);
         path.setAttribute("stroke-width", 0);
@@ -429,15 +437,16 @@ GooFlow.prototype = {
     initDraw: function (id, width, height) {
         var elem;
         if (GooFlow.prototype.useSVG != "") {
-            this.$draw = document.createElementNS(this.ns, 'svg');
+            this.$draw = document.createElementNS("http://www.w3.org/2000/svg", "svg");//可创建带有指定命名空间的元素节点
             this.$workArea.prepend(this.$draw);
             var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
             this.$draw.appendChild(defs);
             defs.appendChild(GooFlow.prototype.getSvgMarker("arrow1", "#15428B"));
             defs.appendChild(GooFlow.prototype.getSvgMarker("arrow2", "#ff3300"));
             defs.appendChild(GooFlow.prototype.getSvgMarker("arrow3", "#ff3300"));
-        } else {
-            this.$draw = document.createElement('v:group');
+        }
+        else {
+            this.$draw = document.createElement("v:group");
             this.$draw.coordsize = width * 3 + "," + height * 3;
             this.$workArea.prepend("<div class='GooFlow_work_vml' style='position:relative;width:" + width * 3 + "px;height:" + height * 3 + "px'></div>");
             this.$workArea.children("div")[0].insertBefore(this.$draw, null);
@@ -445,17 +454,15 @@ GooFlow.prototype = {
         this.$draw.id = id;
         this.$draw.style.width = width * 3 + "px";
         this.$draw.style.height = +height * 3 + "px";
+        //绑定连线的点击选中以及双击编辑事件
         var tmpClk = null;
-        if (GooFlow.prototype.useSVG != "") {
-            tmpClk = 'g';
-        } else {
-            tmpClk = 'PolyLine';
-        }
+        if (GooFlow.prototype.useSVG != "")  tmpClk = "g";
+        else  tmpClk = "PolyLine";
         if (this.$editable) {
-            $(this.$draw).delegate(tmpClk, 'click', {inthis: this}, function (e) {
+            $(this.$draw).delegate(tmpClk, "click", {inthis: this}, function (e) {
                 e.data.inthis.focusItem(this.id, true);
             });
-            $(this.$draw).delegate(tmpClk, 'dblclick', {inthis: this}, function (e) {
+            $(this.$draw).delegate(tmpClk, "dblclick", {inthis: this}, function (e) {
                 var oldTxt, x, y, from, to;
                 var This = e.data.inthis;
                 if (GooFlow.prototype.useSVG != "") {
@@ -491,13 +498,13 @@ GooFlow.prototype = {
                 });
             });
         }
-
     },
     initGroup: function (width, height) {
         this.$group = $("<div class='GooFlow_work_group' style='width:" + width * 3 + "px;height:" + height * 3 + "px'></div>");//存放背景区域的容器
         this.$workArea.prepend(this.$group);
         if (!this.$editable)    return;
-        this.$group.on("mousedown", {inthis: this}, function (e) {
+        //区域划分框操作区的事件绑定
+        this.$group.on("mousedown", {inthis: this}, function (e) {//绑定RESIZE功能以及移动功能
             if (e.button == 2)return false;
             var This = e.data.inthis;
             if (This.$nowType != "group")    return;
@@ -608,6 +615,7 @@ GooFlow.prototype = {
                 return false;
             }
         });
+        //绑定修改文字说明功能
         this.$group.on("dblclick", {inthis: this}, function (e) {
             var This = e.data.inthis;
             if (This.$nowType != "group")    return;
@@ -631,6 +639,7 @@ GooFlow.prototype = {
             });
             return false;
         });
+        //绑定点击事件
         this.$group.mouseup({inthis: this}, function (e) {
 
             var This = e.data.inthis;
@@ -682,7 +691,6 @@ GooFlow.prototype = {
                 return false;
             }
         });
-
     },
     //每一种类型结点及其按钮的说明文字
     setNodeRemarks: function (remark) {
@@ -691,6 +699,7 @@ GooFlow.prototype = {
         });
         this.$nodeRemark = remark;
     },
+
     //切换左边工具栏按钮,传参TYPE表示切换成哪种类型的按钮
     switchToolBtn: function (type) {
         this.$tool.children("#" + this.$id + "_btn_" + this.$nowType.split(" ")[0]).attr("class", "GooFlow_tool_btn");
@@ -949,6 +958,7 @@ GooFlow.prototype = {
                 return this.$areaData[id] || null;
         }
     },
+    //取消所有结点/连线被选定的状态
     blurItem: function () {
         if (this.$focus != "") {
             var jq = $("#" + this.$focus);
@@ -1035,6 +1045,7 @@ GooFlow.prototype = {
         this.$focus = id;
         this.switchToolBtn("cursor");
     },
+    //移动结点到一个新的位置
     moveNode: function (id, left, top) {
         if (!this.$nodeData[id])    return;
         if (this.onItemMove != null && !this.onItemMove(id, "node", left, top))    return;
@@ -1053,6 +1064,7 @@ GooFlow.prototype = {
             this.$nodeData[id].alt = true;
         }
     },
+    //设置结点/连线/分组区域的文字信息
     setName: function (id, name, type) {
         var oldName;
         if (type == "node") {//如果是结点
@@ -1124,6 +1136,7 @@ GooFlow.prototype = {
             this.pushOper("setName", paras);
         }
     },
+    //设置结点的尺寸,仅支持非开始/结束结点
     resizeNode: function (id, width, height) {
         if (!this.$nodeData[id])    return;
         if (this.onItemResize != null && !this.onItemResize(id, "node", width, height))    return;
@@ -1146,6 +1159,7 @@ GooFlow.prototype = {
         //重画转换线
         this.resetLines(id, this.$nodeData[id]);
     },
+    //删除结点
     delNode: function (id) {
         if (!this.$nodeData[id])    return;
         if (this.onItemDel != null && !this.onItemDel(id, "node"))    return;
@@ -1175,6 +1189,7 @@ GooFlow.prototype = {
                 this.$deletedItem[id] = "node";
         }
     },
+    //设置流程图的名称
     setTitle: function (text) {
         this.$title = text;
         if (this.$head)    this.$head.children("label").attr("title", text).text(text);
@@ -1309,7 +1324,7 @@ GooFlow.prototype = {
         this.$areaCount = 0;
         this.$deletedItem = {};
     },
-    ///////////以下为有关画线的方法
+///////////以下为有关画线的方法
     //绘制一条箭头线，并返回线的DOM
     drawLine: function (id, sp, ep, mark, dash) {
         var line;
@@ -1590,6 +1605,7 @@ GooFlow.prototype = {
             return (n1.top + n1.height / 2 + n2.top + n2.height / 2) / 2;
         }
     },
+    //增加一条线
     addLine: function (id, json) {
         if (this.onItemAdd != null && !this.onItemAdd(id, "line", json))return;
         if (this.$undoStack && this.$editable) {
@@ -1649,6 +1665,7 @@ GooFlow.prototype = {
             if (this.$deletedItem[id])    delete this.$deletedItem[id];//在回退删除操作时,去掉该元素的删除记录
         }
     },
+    //重构所有连向某个结点的线的显示，传参结构为$nodeData数组的一个单元结构
     resetLines: function (id, node) {
         for (var i in this.$lineData) {
             var other = null;//获取结束/开始结点的数据
@@ -1743,6 +1760,7 @@ GooFlow.prototype = {
             this.$lineData[id].alt = true;
         }
     },
+    //设置折线中段的X坐标值（可左右移动时）或Y坐标值（可上下移动时）
     setLineM: function (id, M, noStack) {
         if (!this.$lineData[id] || M < 0 || !this.$lineData[id].type || this.$lineData[id].type == "sl")    return false;
         if (this.onLineMove != null && !this.onLineMove(id, M))    return false;
@@ -1773,6 +1791,7 @@ GooFlow.prototype = {
             this.$lineData[id].alt = true;
         }
     },
+    //删除转换线
     delLine: function (id) {
         if (!this.$lineData[id])    return;
         if (this.onItemDel != null && !this.onItemDel(id, "node"))    return;
@@ -1859,6 +1878,7 @@ GooFlow.prototype = {
                 this.$deletedItem[id] = "area";
         }
     },
+    //设置区域分组的颜色
     setAreaColor: function (id, color) {
         if (!this.$areaData[id])    return;
         if (this.$undoStack) {
@@ -1873,6 +1893,7 @@ GooFlow.prototype = {
             this.$areaData[id].alt = true;
         }
     },
+    //设置区域分块的尺寸
     resizeArea: function (id, width, height) {
         if (!this.$areaData[id])    return;
         if (this.onItemResize != null && !this.onItemResize(id, "area", width, height))    return;
@@ -1908,6 +1929,7 @@ GooFlow.prototype = {
             if (this.$deletedItem[id])    delete this.$deletedItem[id];//在回退删除操作时,去掉该元素的删除记录
         }
     },
+    //重构整个流程图设计器的宽高
     reinitSize: function (width, height) {
         var w = (width || 800) - 2;
         var h = (height || 500) - 2;
@@ -1934,8 +1956,9 @@ GooFlow.prototype = {
         }
     }
 }
+//将此类的构造函数加入至JQUERY对象中
 jQuery.extend({
     createGooFlow: function (bgDiv, property) {
         return new GooFlow(bgDiv, property);
     }
-});
+}); 
