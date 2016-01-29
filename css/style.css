@@ -301,7 +301,7 @@ v\:group, v\:rect, v\:imagedata, v\:oval, v\:line, v\:polyline, v\:stroke, v\:te
     background: #ADD2ED;
     border: #C1DCFC solid 1px;
     border-radius: 3px;
-    color: #15428B;
+    color: # #333333;
     background-color: #C1DCFC;
     box-shadow: 1px 1px 2px rgba(148, 170, 194, 2);
 }
@@ -353,6 +353,7 @@ v\:group, v\:rect, v\:imagedata, v\:oval, v\:line, v\:polyline, v\:stroke, v\:te
     display: block;
     left: -10px;
 }
+
 .GooFlow .item_round .span {
     display: block;
     text-align: center;
@@ -373,18 +374,37 @@ v\:group, v\:rect, v\:imagedata, v\:oval, v\:line, v\:polyline, v\:stroke, v\:te
     border-color: #C2DB4E
 }
 
-/*.GooFlow div .rs_right {*/
-/*overflow: hidden;*/
-/*position: absolute;*/
-/*right: -1px;*/
-/*top: -1px;*/
-/*height: 100%;*/
-/*width: 6px;*/
-/*cursor: w-resize*/
-/*}*/
+.GooFlow_area div .rs_rb {
+    width: 7px;
+    height: 7px;
+    overflow: hidden;
+    bottom: 1px;
+    position: absolute;
+    right: 1px;
+    background: url(../img/gooflow_tip.png) no-repeat 0 7px;
+    cursor: nw-resize;
+}
 
+.GooFlow_area div .rs_right {
+    overflow: hidden;
+    position: absolute;
+    right: -1px;
+    top: -1px;
 
+    height: 100%;
+    width: 6px;
+    cursor: w-resize
+}
 
+.GooFlow_area div .rs_bottom {
+    overflow: hidden;
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+    height: 6px;
+    width: 100%;
+    cursor: n-resize;
+}
 
 .GooFlow div .rs_close {
     position: absolute;
@@ -397,17 +417,29 @@ v\:group, v\:rect, v\:imagedata, v\:oval, v\:line, v\:polyline, v\:stroke, v\:te
     background: url(../img/gooflow_tip.png) no-repeat 0px 0px
 }
 
-/*.GooFlow .rs_ghost {*/
-/*position: absolute;*/
-/*display: none;*/
-/*overflow: hidden;*/
-/*border: #8EA4C1 1px dashed;*/
-/*background: #D9E8FB;*/
-/*filter: Alpha(Opacity=60);*/
-/*-moz-opacity: 0.6;*/
-/*opacity: 0.6;*/
-/*z-index: 10*/
-/*}*/
+.GooFlow_area div .rs_close {
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    width: 7px;
+    height: 7px;
+    overflow: hidden;
+    cursor: pointer;
+    background: url(../img/gooflow_tip.png) no-repeat 0px 0px
+}
+
+.GooFlow div.rs_ghost {
+    position: absolute;
+    display: none;
+    overflow: hidden;
+    border: #8EA4C1 1px dashed;
+    background: #D9E8FB;
+    width: 22px;
+    filter: Alpha(Opacity=60);
+    -moz-opacity: 0.6;
+    opacity: 0.6;
+    z-index: 10
+}
 
 .GooFlow .item_focus {
     border: #3892D3 1px solid

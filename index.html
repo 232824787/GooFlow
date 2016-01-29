@@ -21,7 +21,7 @@
             toolBtns: ["start round", "end", "task", "node"],
 //            toolBtns: ["start round", "end", "task", "node", "chat", "state", "plug", "join", "fork", "complex mix"],
             haveHead: true,
-            headBtns: ["new", "open icon-dakai", "save icon-baocun", "undo icon-chexiao", "redo icon-huifu", "reload icon-shuaxin"],//如果haveHead=true，则定义HEAD区的按钮
+            headBtns: ["new", "open", "save", "undo", "redo", "reload"],//如果haveHead=true，则定义HEAD区的按钮
             haveTool: true,
             haveGroup: true,
             useOperStack: true
@@ -45,7 +45,7 @@
         };
         var gf;
         $(document).ready(function () {
-            gf = $.createGooFlow($("#demo"), property);
+            gf = $.createGooFlow($("#gf"), property);
             gf.setNodeRemarks(remark);
             //demo.onItemDel=function(id,type){
             //	return confirm("确定要删除该单元吗?");
@@ -88,15 +88,6 @@
                         "height": 24,
                         "alt": true
                     },
-                    "demo_node_13": {
-                        "name": "n夺",
-                        "left": 205,
-                        "top": 108,
-                        "type": "complex mix",
-                        "width": 86,
-                        "height": 24,
-                        "alt": true
-                    },
                     "demo_node_14": {
                         "name": "桂东区",
                         "left": 49,
@@ -114,11 +105,17 @@
         function Export() {
             document.getElementById("result").value = JSON.stringify(gf.exportData());
         }
+        function Import() {
+            gf.clearData()
+            gf.loadData(JSON.parse($("#result").val()));
+        }
     </script>
 </head>
 <body>
-<div id="demo" style="margin:10px"></div>
-<input id="submit" type="button" value='导出结果' onclick="Export()"/>
-<textarea id="result" row="6"></textarea>
+<div id="gf" style="margin:10px"></div>
+<input id="submito" type="button" value='导出结果' onclick="Export()"/>
+<input id="submiti" type="button" value='导入数据' onclick="Import()"/>
+<br/>
+<textarea id="result" rows="20" cols="100"></textarea>
 </body>
 </html>

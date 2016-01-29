@@ -20,23 +20,23 @@
     content: "\e608";
 }
 
-.icon-baocun:before {
+.ico_save:before {
     content: "\e878";
 }
 
-.icon-dakai:before {
+.ico_open:before {
     content: "\e65b";
 }
 
-.icon-chexiao:before {
+.ico_undo:before {
     content: "\e61c";
 }
 
-.icon-huifu:before {
+.ico_redo:before {
     content: "\e615";
 }
 
-.icon-shuaxin:before {
+.ico_reload:before {
     content: "\e6aa";
 }
 
