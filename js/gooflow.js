@@ -542,6 +542,7 @@ GooFlow.prototype = {
             }
             else {
                 var vX = X - This.$areaData[id].left;
+
                 var vY = Y - This.$areaData[id].top;
             }
             var isMove = false;
