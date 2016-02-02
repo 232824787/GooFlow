@@ -301,7 +301,7 @@ v\:group, v\:rect, v\:imagedata, v\:oval, v\:line, v\:polyline, v\:stroke, v\:te
     background: #ADD2ED;
     border: #C1DCFC solid 1px;
     border-radius: 3px;
-    color: # #333333;
+    color: #333333;
     background-color: #C1DCFC;
     box-shadow: 1px 1px 2px rgba(148, 170, 194, 2);
 }
