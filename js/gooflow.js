@@ -1,17 +1,18 @@
 function GooFlow(bgDiv, property) {
-//³õÊ¼»¯ÇøÓòÍ¼µÄ¶ÔÏó
+//åˆå§‹åŒ–åŒºåŸŸå›¾çš„å¯¹è±¡
+//    this.$id = bgDiv.abbr("id");
     this.$id = bgDiv.attr("id");
-    this.$bgDiv = bgDiv;//×î¸¸¿ò¼ÜµÄDIV
+    this.$bgDiv = bgDiv;//æœ€çˆ¶æ¡†æ¶çš„DIV
     this.$bgDiv.addClass("GooFlow");
     var width = (property.width || 800) - 2;
     var height = (property.height || 500) - 2;
     this.$bgDiv.css({width: width + "px", height: height + "px"});
-    this.$tool = null;//×ó²à¹¤¾ßÀ¸¶ÔÏó
-    this.$head = null;//¶¥²¿±êÇ©¼°¹¤¾ßÀ¸°´Å¥
-    this.$title = "newFlow_1";//Á÷³ÌÍ¼µÄÃû³Æ
+    this.$tool = null;//å·¦ä¾§å·¥å…·æ å¯¹è±¡
+    this.$head = null;//é¡¶éƒ¨æ ‡ç­¾åŠå·¥å…·æ æŒ‰é’®
+    this.$title = "newFlow_1";//æµç¨‹å›¾çš„åç§°
     this.$defaultTitleId = '2';
-    this.$nodeRemark = {};//Ã¿Ò»ÖÖ½áµã»ò°´Å¥µÄËµÃ÷ÎÄ×Ö,JSON¸ñÊ½,keyÎªÀàÃû,valueÎªÓÃ»§×Ô¶¨ÒåÎÄ×ÖËµÃ÷
-    this.$nowType = "cursor";//µ±Ç°Òª»æÖÆµÄ¶ÔÏóÀàĞÍ
+    this.$nodeRemark = {};//æ¯ä¸€ç§ç»“ç‚¹æˆ–æŒ‰é’®çš„è¯´æ˜æ–‡å­—,JSONæ ¼å¼,keyä¸ºç±»å,valueä¸ºç”¨æˆ·è‡ªå®šä¹‰æ–‡å­—è¯´æ˜
+    this.$nowType = "cursor";//å½“å‰è¦ç»˜åˆ¶çš„å¯¹è±¡ç±»å‹
     this.$lineData = {};
     this.$lineCount = 0;
     this.$nodeData = {};
@@ -21,11 +22,11 @@ function GooFlow(bgDiv, property) {
     this.$lineDom = {};
     this.$nodeDom = {};
     this.$areaDom = {};
-    this.$max = property.initNum || 1;//¼ÆËãÄ¬ÈÏIDÖµµÄÆğÊ¼SEQUENCE
-    this.$focus = "";//µ±Ç°±»Ñ¡¶¨µÄ½áµã/×ª»»ÏßID,Èç¹ûÃ»Ñ¡ÖĞ»òÕß¹¤×÷Çø±»Çå¿Õ,ÔòÎª""
-    this.$cursor = "default";//Êó±êÖ¸ÕëÔÚ¹¤×÷ÇøÄÚµÄÑùÊ½
-    this.$editable = false;//¹¤×÷ÇøÊÇ·ñ¿É±à¼­
-    this.$deletedItem = {};//ÔÚÁ÷³ÌÍ¼µÄ±à¼­²Ù×÷ÖĞ±»É¾³ıµôµÄÔªËØID¼¯ºÏ,ÔªËØIDÎªKEY,ÔªËØÀàĞÍ(node,line.area)ÎªVALUE
+    this.$max = property.initNum || 1;//è®¡ç®—é»˜è®¤IDå€¼çš„èµ·å§‹SEQUENCE
+    this.$focus = "";//å½“å‰è¢«é€‰å®šçš„ç»“ç‚¹/è½¬æ¢çº¿ID,å¦‚æœæ²¡é€‰ä¸­æˆ–è€…å·¥ä½œåŒºè¢«æ¸…ç©º,åˆ™ä¸º""
+    this.$cursor = "default";//é¼ æ ‡æŒ‡é’ˆåœ¨å·¥ä½œåŒºå†…çš„æ ·å¼
+    this.$editable = false;//å·¥ä½œåŒºæ˜¯å¦å¯ç¼–è¾‘
+    this.$deletedItem = {};//åœ¨æµç¨‹å›¾çš„ç¼–è¾‘æ“ä½œä¸­è¢«åˆ é™¤æ‰çš„å…ƒç´ IDé›†åˆ,å…ƒç´ IDä¸ºKEY,å…ƒç´ ç±»å‹(node,line.area)ä¸ºVALUE
     var headHeight = 0;
     var tmp = "";
     if (property.haveHead) {
@@ -37,10 +38,10 @@ function GooFlow(bgDiv, property) {
         this.$head = $(tmp);
         this.$bgDiv.append(this.$head);
         headHeight = 24;
-        //ÒÔÏÂÊÇµ±¹¤¾ßÀ¸°´Å¥±»µã»÷Ê±´¥·¢µÄÊÂ¼ş×Ô¶¨Òå(Ğéº¯Êı),¸ñÊ½Îªfunction(),ÒòÎª¿ÉÖ±½ÓÓÃTHIS²Ù×÷¶ÔÏó±¾Éí,²»ÓÃ´«²Î£»ÓÃ»§¿É×ÔĞĞÖØ¶¨Òå:
-        this.onBtnNewClick = function () { //ĞÂ½¨
+        //ä»¥ä¸‹æ˜¯å½“å·¥å…·æ æŒ‰é’®è¢«ç‚¹å‡»æ—¶è§¦å‘çš„äº‹ä»¶è‡ªå®šä¹‰(è™šå‡½æ•°),æ ¼å¼ä¸ºfunction(),å› ä¸ºå¯ç›´æ¥ç”¨THISæ“ä½œå¯¹è±¡æœ¬èº«,ä¸ç”¨ä¼ å‚ï¼›ç”¨æˆ·å¯è‡ªè¡Œé‡å®šä¹‰:
+        this.onBtnNewClick = function () { //æ–°å»º
             var that = this;
-            var title = prompt(ch('ÊäÈëĞÂµÄÃû³Æ£º'), 'newFlow_' + this.$defaultTitleId++);
+            var title = prompt(ch('è¾“å…¥æ–°çš„åç§°ï¼š'), 'newFlow_' + this.$defaultTitleId++);
             if (title != null) {
                 this.clearData();
                 this.setTitle(title);
@@ -48,15 +49,15 @@ function GooFlow(bgDiv, property) {
         }
         this.onBtnOpenClick = function () {
             var that = this;
-            //´ò¿ª°´Å¥×Ô¶¨Òå
+            //æ‰“å¼€æŒ‰é’®è‡ªå®šä¹‰
         }
         this.onBtnSaveClick = function () {
             var that = this;
-            //±£´æÁ÷³ÌÍ¼°´Å¥¶¨Òå
+            //ä¿å­˜æµç¨‹å›¾æŒ‰é’®å®šä¹‰
         }
         this.onFreshClick = function () {
             var that = this;
-            //ÖØÔØÁ÷³ÌÍ¼°´Å¥¶¨Òå
+            //é‡è½½æµç¨‹å›¾æŒ‰é’®å®šä¹‰
         }
         if (property.headBtns)
             this.$head.on("click", {inthis: this}, function (e) {
@@ -65,7 +66,7 @@ function GooFlow(bgDiv, property) {
                 if (tar.tagName == "DIV" || tar.tagName == "SPAN")    return;
                 else if (tar.tagName == "a")    tar = tar.childNode[0];
                 var This = e.data.inthis;
-                //¶¨Òå¶¥²¿²Ù×÷À¸°´Å¥µÄÊÂ¼ş
+                //å®šä¹‰é¡¶éƒ¨æ“ä½œæ æŒ‰é’®çš„äº‹ä»¶
                 switch ($(tar).attr("class")) {
                     case "ico_new":
                         if (This.onBtnNewClick != null)    This.onBtnNewClick();
@@ -92,21 +93,21 @@ function GooFlow(bgDiv, property) {
     if (property.haveTool) {
         this.$bgDiv.append("<div class='GooFlow_tool'" + (property.haveHead ? "" : " style='margin-top:3px'") + "><div style='height:" + (height - headHeight - (property.haveHead ? 7 : 10)) + "px' class='GooFlow_tool_div'></div></div>");
         this.$tool = this.$bgDiv.find(".GooFlow_tool div");
-        //Î´¼Ó´úÂë£º¼ÓÈë»æÍ¼¹¤¾ß°´Å¥
+        //æœªåŠ ä»£ç ï¼šåŠ å…¥ç»˜å›¾å·¥å…·æŒ‰é’®
         this.$tool.append("<a href='javascript:void(0)' type='cursor' class='GooFlow_tool_btndown' id='" + this.$id + "_btn_cursor'><b class='ico_cursor'/></a><a href='javascript:void(0)' type='direct' class='GooFlow_tool_btn' id='" + this.$id + "_btn_direct'><b class='ico_direct'/></a>");
         if (property.toolBtns && property.toolBtns.length > 0) {
             tmp = "<span/>";
             for (var i = 0; i < property.toolBtns.length; ++i) {
-                tmp += "<a href='javascript:void(0)' type='" + property.toolBtns[i] + "' id='" + this.$id + "_btn_" + property.toolBtns[i].split(" ")[0] + "' class='GooFlow_tool_btn'><b class='ico_" + property.toolBtns[i] + "'/></a>";//¼ÓÈë×Ô¶¨Òå°´Å¥
+                tmp += "<a href='javascript:void(0)' type='" + property.toolBtns[i] + "' id='" + this.$id + "_btn_" + property.toolBtns[i].split(" ")[0] + "' class='GooFlow_tool_btn'><b class='ico_" + property.toolBtns[i] + "'/></a>";//åŠ å…¥è‡ªå®šä¹‰æŒ‰é’®
             }
             this.$tool.append(tmp);
         }
-        //¼ÓÈëÇøÓò»®·Ö¿ò¹¤¾ß¿ª¹Ø°´Å¥
+        //åŠ å…¥åŒºåŸŸåˆ’åˆ†æ¡†å·¥å…·å¼€å…³æŒ‰é’®
         if (property.haveGroup)
             this.$tool.append("<span/><a href='javascript:void(0)' type='group' class='GooFlow_tool_btn' id='" + this.$id + "_btn_group'><b class='ico_group'/></a>");
         toolWidth = 31;
         this.$nowType = "cursor";
-        //°ó¶¨¸÷¸ö°´Å¥µÄµã»÷ÊÂ¼ş
+        //ç»‘å®šå„ä¸ªæŒ‰é’®çš„ç‚¹å‡»äº‹ä»¶
         this.$tool.on("click", {inthis: this}, function (e) {
             if (!e)e = window.event;
             var tar;
@@ -126,7 +127,7 @@ function GooFlow(bgDiv, property) {
             e.data.inthis.switchToolBtn(type);
             return false;
         });
-        this.$editable = true;//Ö»ÓĞ¾ßÓĞ¹¤¾ßÀ¸Ê±¿É±à¼­
+        this.$editable = true;//åªæœ‰å…·æœ‰å·¥å…·æ æ—¶å¯ç¼–è¾‘
     }
     width = width - toolWidth - 8;
     height = height - headHeight - (property.haveHead ? 5 : 8);
@@ -134,7 +135,7 @@ function GooFlow(bgDiv, property) {
     this.$workArea = $("<div class='GooFlow_work_inner' style='width:" + width * 3 + "px;height:" + height * 3 + "px'></div>")
         .attr({"unselectable": "on", "onselectstart": 'return false', "onselect": 'document.selection.empty()'});
     this.$bgDiv.children(".GooFlow_work").append(this.$workArea);
-    this.$draw = null;//»­Ê¸Á¿ÏßÌõµÄÈİÆ÷
+    this.$draw = null;//ç”»çŸ¢é‡çº¿æ¡çš„å®¹å™¨
     this.initDraw("draw_" + this.$id, width, height);
     this.$group = null;
     if (property.haveGroup)
@@ -163,7 +164,7 @@ function GooFlow(bgDiv, property) {
             });
             e.data.inthis.$max++;
         });
-        //»®ÏßÊ±ÓÃµÄ°ó¶¨
+        //åˆ’çº¿æ—¶ç”¨çš„ç»‘å®š
         this.$workArea.mousemove({inthis: this}, function (e) {
             if (e.data.inthis.$nowType != "direct")    return;
             var lineStart = $(this).data("lineStart");
@@ -187,9 +188,9 @@ function GooFlow(bgDiv, property) {
             var tmp = document.getElementById("GooFlow_tmp_line");
             if (tmp)e.data.inthis.$draw.removeChild(tmp);
         });
-        //ÎªÁË½áµã¶øÔö¼ÓµÄÒ»Ğ©¼¯Ìådelegate°ó¶¨
+        //ä¸ºäº†ç»“ç‚¹è€Œå¢åŠ çš„ä¸€äº›é›†ä½“delegateç»‘å®š
         this.initWorkForNode();
-        //¶Ô½áµã½øĞĞÒÆ¶¯»òÕßRESIZEÊ±ÓÃÀ´ÏÔÊ¾µÄÕÚÕÖ²ã
+        //å¯¹ç»“ç‚¹è¿›è¡Œç§»åŠ¨æˆ–è€…RESIZEæ—¶ç”¨æ¥æ˜¾ç¤ºçš„é®ç½©å±‚
         this.$ghost = $("<div class='rs_ghost GooFlow_item item_round'></div>").attr({
             "unselectable": "on",
             "onselectstart": 'return false',
@@ -198,7 +199,7 @@ function GooFlow(bgDiv, property) {
         this.$bgDiv.append(this.$ghost);
         this.$textArea = $("<textarea></textarea>");
         this.$bgDiv.append(this.$textArea);
-        this.$lineMove = $("<div class='GooFlow_line_move' style='display:none'></div>");//²Ù×÷ÕÛÏßÊ±µÄÒÆ¶¯¿ò
+        this.$lineMove = $("<div class='GooFlow_line_move' style='display:none'></div>");//æ“ä½œæŠ˜çº¿æ—¶çš„ç§»åŠ¨æ¡†
         this.$workArea.append(this.$lineMove);
         this.$lineMove.on("mousedown", {inthis: this}, function (e) {
             if (e.button == 2)return false;
@@ -250,7 +251,7 @@ function GooFlow(bgDiv, property) {
                 document.onmouseup = null;
             }
         });
-        this.$lineOper = $("<div class='GooFlow_line_oper' style='display:none'><b class='b_l1'></b><b class='b_l2'></b><b class='b_l3'></b><b class='b_x'></b></div>");//Ñ¡¶¨ÏßÊ±ÏÔÊ¾µÄ²Ù×÷¿ò
+        this.$lineOper = $("<div class='GooFlow_line_oper' style='display:none'><b class='b_l1'></b><b class='b_l2'></b><b class='b_l3'></b><b class='b_x'></b></div>");//é€‰å®šçº¿æ—¶æ˜¾ç¤ºçš„æ“ä½œæ¡†
         this.$workArea.append(this.$lineOper);
         this.$lineOper.on("click", {inthis: this}, function (e) {
             if (!e)e = window.event;
@@ -274,44 +275,44 @@ function GooFlow(bgDiv, property) {
             }
         });
 
-        //ÏÂÃæ°ó¶¨µ±½áµã/Ïß/·Ö×é¿éµÄÒ»Ğ©²Ù×÷ÊÂ¼ş,ÕâĞ©ÊÂ¼ş¿ÉÖ±½ÓÍ¨¹ıthis·ÃÎÊ¶ÔÏó±¾Éí
-        //µ±²Ù×÷Ä³¸öµ¥Ôª£¨½áµã/Ïß/·Ö×é¿é£©±»Ìí¼ÓÊ±£¬´¥·¢µÄ·½·¨£¬·µ»ØFALSE¿É×èÖ¹Ìí¼ÓÊÂ¼şµÄ·¢Éú
-        //¸ñÊ½function(id£¬type,json)£ºidÊÇµ¥ÔªµÄÎ¨Ò»±êÊ¶ID,typeÊÇµ¥ÔªµÄÖÖÀà,ÓĞ"node","line","area"ÈıÖÖÈ¡Öµ,json¼´addNode,addLine»òaddArea·½·¨µÄµÚ¶ş¸ö´«²Îjson.
+        //ä¸‹é¢ç»‘å®šå½“ç»“ç‚¹/çº¿/åˆ†ç»„å—çš„ä¸€äº›æ“ä½œäº‹ä»¶,è¿™äº›äº‹ä»¶å¯ç›´æ¥é€šè¿‡thisè®¿é—®å¯¹è±¡æœ¬èº«
+        //å½“æ“ä½œæŸä¸ªå•å…ƒï¼ˆç»“ç‚¹/çº¿/åˆ†ç»„å—ï¼‰è¢«æ·»åŠ æ—¶ï¼Œè§¦å‘çš„æ–¹æ³•ï¼Œè¿”å›FALSEå¯é˜»æ­¢æ·»åŠ äº‹ä»¶çš„å‘ç”Ÿ
+        //æ ¼å¼function(idï¼Œtype,json)ï¼šidæ˜¯å•å…ƒçš„å”¯ä¸€æ ‡è¯†ID,typeæ˜¯å•å…ƒçš„ç§ç±»,æœ‰"node","line","area"ä¸‰ç§å–å€¼,jsonå³addNode,addLineæˆ–addAreaæ–¹æ³•çš„ç¬¬äºŒä¸ªä¼ å‚json.
         this.onItemAdd = null;
-        //µ±²Ù×÷Ä³¸öµ¥Ôª£¨½áµã/Ïß/·Ö×é¿é£©±»É¾³ıÊ±£¬´¥·¢µÄ·½·¨£¬·µ»ØFALSE¿É×èÖ¹É¾³ıÊÂ¼şµÄ·¢Éú
-        //¸ñÊ½function(id£¬type)£ºidÊÇµ¥ÔªµÄÎ¨Ò»±êÊ¶ID,typeÊÇµ¥ÔªµÄÖÖÀà,ÓĞ"node","line","area"ÈıÖÖÈ¡Öµ
+        //å½“æ“ä½œæŸä¸ªå•å…ƒï¼ˆç»“ç‚¹/çº¿/åˆ†ç»„å—ï¼‰è¢«åˆ é™¤æ—¶ï¼Œè§¦å‘çš„æ–¹æ³•ï¼Œè¿”å›FALSEå¯é˜»æ­¢åˆ é™¤äº‹ä»¶çš„å‘ç”Ÿ
+        //æ ¼å¼function(idï¼Œtype)ï¼šidæ˜¯å•å…ƒçš„å”¯ä¸€æ ‡è¯†ID,typeæ˜¯å•å…ƒçš„ç§ç±»,æœ‰"node","line","area"ä¸‰ç§å–å€¼
         this.onItemDel = null;
-        //µ±²Ù×÷Ä³¸öµ¥Ôª£¨½áµã/·Ö×é¿é£©±»ÒÆ¶¯Ê±£¬´¥·¢µÄ·½·¨£¬·µ»ØFALSE¿É×èÖ¹ÒÆ¶¯ÊÂ¼şµÄ·¢Éú
-        //¸ñÊ½function(id£¬type,left,top)£ºidÊÇµ¥ÔªµÄÎ¨Ò»±êÊ¶ID,typeÊÇµ¥ÔªµÄÖÖÀà,ÓĞ"node","area"Á½ÖÖÈ¡Öµ£¬Ïßline²»Ö§³ÖÒÆ¶¯,leftÊÇĞÂµÄ×ó±ß¾à×ø±ê£¬topÊÇĞÂµÄ¶¥±ß¾à×ø±ê
+        //å½“æ“ä½œæŸä¸ªå•å…ƒï¼ˆç»“ç‚¹/åˆ†ç»„å—ï¼‰è¢«ç§»åŠ¨æ—¶ï¼Œè§¦å‘çš„æ–¹æ³•ï¼Œè¿”å›FALSEå¯é˜»æ­¢ç§»åŠ¨äº‹ä»¶çš„å‘ç”Ÿ
+        //æ ¼å¼function(idï¼Œtype,left,top)ï¼šidæ˜¯å•å…ƒçš„å”¯ä¸€æ ‡è¯†ID,typeæ˜¯å•å…ƒçš„ç§ç±»,æœ‰"node","area"ä¸¤ç§å–å€¼ï¼Œçº¿lineä¸æ”¯æŒç§»åŠ¨,leftæ˜¯æ–°çš„å·¦è¾¹è·åæ ‡ï¼Œtopæ˜¯æ–°çš„é¡¶è¾¹è·åæ ‡
         this.onItemMove = null;
-        //µ±²Ù×÷Ä³¸öµ¥Ôª£¨½áµã/Ïß/·Ö×é¿é£©±»ÖØÃüÃûÊ±£¬´¥·¢µÄ·½·¨£¬·µ»ØFALSE¿É×èÖ¹ÖØÃüÃûÊÂ¼şµÄ·¢Éú
-        //¸ñÊ½function(id,name,type)£ºidÊÇµ¥ÔªµÄÎ¨Ò»±êÊ¶ID,typeÊÇµ¥ÔªµÄÖÖÀà,ÓĞ"node","line","area"ÈıÖÖÈ¡Öµ,nameÊÇĞÂµÄÃû³Æ
+        //å½“æ“ä½œæŸä¸ªå•å…ƒï¼ˆç»“ç‚¹/çº¿/åˆ†ç»„å—ï¼‰è¢«é‡å‘½åæ—¶ï¼Œè§¦å‘çš„æ–¹æ³•ï¼Œè¿”å›FALSEå¯é˜»æ­¢é‡å‘½åäº‹ä»¶çš„å‘ç”Ÿ
+        //æ ¼å¼function(id,name,type)ï¼šidæ˜¯å•å…ƒçš„å”¯ä¸€æ ‡è¯†ID,typeæ˜¯å•å…ƒçš„ç§ç±»,æœ‰"node","line","area"ä¸‰ç§å–å€¼,nameæ˜¯æ–°çš„åç§°
         this.onItemRename = null;
-        //µ±²Ù×÷Ä³¸öµ¥Ôª£¨½áµã/Ïß£©±»ÓÉ²»Ñ¡ÖĞ±ä³ÉÑ¡ÖĞÊ±£¬´¥·¢µÄ·½·¨£¬·µ»ØFALSE¿É×èÖ¹Ñ¡ÖĞÊÂ¼şµÄ·¢Éú
-        //¸ñÊ½function(id,type)£ºidÊÇµ¥ÔªµÄÎ¨Ò»±êÊ¶ID,typeÊÇµ¥ÔªµÄÖÖÀà,ÓĞ"node","line"Á½ÖÖÈ¡Öµ,"area"²»Ö§³Ö±»Ñ¡ÖĞ
+        //å½“æ“ä½œæŸä¸ªå•å…ƒï¼ˆç»“ç‚¹/çº¿ï¼‰è¢«ç”±ä¸é€‰ä¸­å˜æˆé€‰ä¸­æ—¶ï¼Œè§¦å‘çš„æ–¹æ³•ï¼Œè¿”å›FALSEå¯é˜»æ­¢é€‰ä¸­äº‹ä»¶çš„å‘ç”Ÿ
+        //æ ¼å¼function(id,type)ï¼šidæ˜¯å•å…ƒçš„å”¯ä¸€æ ‡è¯†ID,typeæ˜¯å•å…ƒçš„ç§ç±»,æœ‰"node","line"ä¸¤ç§å–å€¼,"area"ä¸æ”¯æŒè¢«é€‰ä¸­
         this.onItemFocus = null;
-        //µ±²Ù×÷Ä³¸öµ¥Ôª£¨½áµã/Ïß£©±»ÓÉÑ¡ÖĞ±ä³É²»Ñ¡ÖĞÊ±£¬´¥·¢µÄ·½·¨£¬·µ»ØFALSE¿É×èÖ¹È¡ÏûÑ¡ÖĞÊÂ¼şµÄ·¢Éú
-        //¸ñÊ½function(id£¬type)£ºidÊÇµ¥ÔªµÄÎ¨Ò»±êÊ¶ID,typeÊÇµ¥ÔªµÄÖÖÀà,ÓĞ"node","line"Á½ÖÖÈ¡Öµ,"area"²»Ö§³Ö±»È¡ÏûÑ¡ÖĞ
+        //å½“æ“ä½œæŸä¸ªå•å…ƒï¼ˆç»“ç‚¹/çº¿ï¼‰è¢«ç”±é€‰ä¸­å˜æˆä¸é€‰ä¸­æ—¶ï¼Œè§¦å‘çš„æ–¹æ³•ï¼Œè¿”å›FALSEå¯é˜»æ­¢å–æ¶ˆé€‰ä¸­äº‹ä»¶çš„å‘ç”Ÿ
+        //æ ¼å¼function(idï¼Œtype)ï¼šidæ˜¯å•å…ƒçš„å”¯ä¸€æ ‡è¯†ID,typeæ˜¯å•å…ƒçš„ç§ç±»,æœ‰"node","line"ä¸¤ç§å–å€¼,"area"ä¸æ”¯æŒè¢«å–æ¶ˆé€‰ä¸­
         this.onItemBlur = null;
-        //µ±²Ù×÷Ä³¸öµ¥Ôª£¨½áµã/·Ö×é¿é£©±»ÖØ¶¨Òå´óĞ¡»òÔìĞÍÊ±£¬´¥·¢µÄ·½·¨£¬·µ»ØFALSE¿É×èÖ¹ÖØ¶¨´óĞ¡/ÔìĞÍÊÂ¼şµÄ·¢Éú
-        //¸ñÊ½function(id£¬type,width,height)£ºidÊÇµ¥ÔªµÄÎ¨Ò»±êÊ¶ID,typeÊÇµ¥ÔªµÄÖÖÀà,ÓĞ"node","line","area"ÈıÖÖÈ¡Öµ;widthÊÇĞÂµÄ¿í¶È,heightÊÇĞÂµÄ¸ß¶È
+        //å½“æ“ä½œæŸä¸ªå•å…ƒï¼ˆç»“ç‚¹/åˆ†ç»„å—ï¼‰è¢«é‡å®šä¹‰å¤§å°æˆ–é€ å‹æ—¶ï¼Œè§¦å‘çš„æ–¹æ³•ï¼Œè¿”å›FALSEå¯é˜»æ­¢é‡å®šå¤§å°/é€ å‹äº‹ä»¶çš„å‘ç”Ÿ
+        //æ ¼å¼function(idï¼Œtype,width,height)ï¼šidæ˜¯å•å…ƒçš„å”¯ä¸€æ ‡è¯†ID,typeæ˜¯å•å…ƒçš„ç§ç±»,æœ‰"node","line","area"ä¸‰ç§å–å€¼;widthæ˜¯æ–°çš„å®½åº¦,heightæ˜¯æ–°çš„é«˜åº¦
         this.onItemResize = null;
-        //µ±ÒÆ¶¯Ä³ÌõÕÛÏßÖĞ¶ÎµÄÎ»ÖÃ£¬´¥·¢µÄ·½·¨£¬·µ»ØFALSE¿É×èÖ¹ÖØ¶¨´óĞ¡/ÔìĞÍÊÂ¼şµÄ·¢Éú
-        //¸ñÊ½function(id£¬M)£ºidÊÇµ¥ÔªµÄÎ¨Ò»±êÊ¶ID,MÊÇÖĞ¶ÎµÄĞÂX(»òY)µÄ×ø±ê
+        //å½“ç§»åŠ¨æŸæ¡æŠ˜çº¿ä¸­æ®µçš„ä½ç½®ï¼Œè§¦å‘çš„æ–¹æ³•ï¼Œè¿”å›FALSEå¯é˜»æ­¢é‡å®šå¤§å°/é€ å‹äº‹ä»¶çš„å‘ç”Ÿ
+        //æ ¼å¼function(idï¼ŒM)ï¼šidæ˜¯å•å…ƒçš„å”¯ä¸€æ ‡è¯†ID,Mæ˜¯ä¸­æ®µçš„æ–°X(æˆ–Y)çš„åæ ‡
         this.onLineMove = null;
-        //µ±±ä»»Ä³ÌõÁ¬½ÓÏßµÄÀàĞÍ£¬´¥·¢µÄ·½·¨£¬·µ»ØFALSE¿É×èÖ¹ÖØ¶¨´óĞ¡/ÔìĞÍÊÂ¼şµÄ·¢Éú
-        //¸ñÊ½function(id£¬type)£ºidÊÇµ¥ÔªµÄÎ¨Ò»±êÊ¶ID,typeÊÇÁ¬½ÓÏßµÄĞÂÀàĞÍ,"sl":Ö±Ïß,"lr":ÖĞ¶Î¿É×óÓÒÒÆ¶¯µÄÕÛÏß,"tb":ÖĞ¶Î¿ÉÉÏÏÂÒÆ¶¯µÄÕÛÏß
+        //å½“å˜æ¢æŸæ¡è¿æ¥çº¿çš„ç±»å‹ï¼Œè§¦å‘çš„æ–¹æ³•ï¼Œè¿”å›FALSEå¯é˜»æ­¢é‡å®šå¤§å°/é€ å‹äº‹ä»¶çš„å‘ç”Ÿ
+        //æ ¼å¼function(idï¼Œtype)ï¼šidæ˜¯å•å…ƒçš„å”¯ä¸€æ ‡è¯†ID,typeæ˜¯è¿æ¥çº¿çš„æ–°ç±»å‹,"sl":ç›´çº¿,"lr":ä¸­æ®µå¯å·¦å³ç§»åŠ¨çš„æŠ˜çº¿,"tb":ä¸­æ®µå¯ä¸Šä¸‹ç§»åŠ¨çš„æŠ˜çº¿
         this.onLineSetType = null;
-        //µ±ÓÃÖØÉ«±ê×¢Ä³¸ö½áµã/×ª»»ÏßÊ±´¥·¢µÄ·½·¨£¬·µ»ØFALSE¿É×èÖ¹ÖØ¶¨´óĞ¡/ÔìĞÍÊÂ¼şµÄ·¢Éú
-        //¸ñÊ½function(id£¬type£¬mark)£ºidÊÇµ¥ÔªµÄÎ¨Ò»±êÊ¶ID,typeÊÇµ¥ÔªÀàĞÍ£¨"node"½áµã,"line"×ª»»Ïß£©£¬markÎª²¼¶ûÖµ,±íÊ¾ÊÇÒª±ê×¢TRUE»¹ÊÇÈ¡Ïû±ê×¢FALSE
+        //å½“ç”¨é‡è‰²æ ‡æ³¨æŸä¸ªç»“ç‚¹/è½¬æ¢çº¿æ—¶è§¦å‘çš„æ–¹æ³•ï¼Œè¿”å›FALSEå¯é˜»æ­¢é‡å®šå¤§å°/é€ å‹äº‹ä»¶çš„å‘ç”Ÿ
+        //æ ¼å¼function(idï¼Œtypeï¼Œmark)ï¼šidæ˜¯å•å…ƒçš„å”¯ä¸€æ ‡è¯†ID,typeæ˜¯å•å…ƒç±»å‹ï¼ˆ"node"ç»“ç‚¹,"line"è½¬æ¢çº¿ï¼‰ï¼Œmarkä¸ºå¸ƒå°”å€¼,è¡¨ç¤ºæ˜¯è¦æ ‡æ³¨TRUEè¿˜æ˜¯å–æ¶ˆæ ‡æ³¨FALSE
         this.onItemMark = null;
 
-        if (property.useOperStack && this.$editable) {//Èç¹ûÒªÊ¹ÓÃ¶ÑÕ»¼ÇÂ¼²Ù×÷²¢Ìá¹©¡°³·Ïú/ÖØ×ö¡±µÄ¹¦ÄÜ,Ö»ÔÚ±à¼­×´Ì¬ÏÂÓĞĞ§
+        if (property.useOperStack && this.$editable) {//å¦‚æœè¦ä½¿ç”¨å †æ ˆè®°å½•æ“ä½œå¹¶æä¾›â€œæ’¤é”€/é‡åšâ€çš„åŠŸèƒ½,åªåœ¨ç¼–è¾‘çŠ¶æ€ä¸‹æœ‰æ•ˆ
             this.$undoStack = [];
             this.$redoStack = [];
             this.$isUndo = 0;
-            ///////////////ÒÔÏÂÊÇ¹¹Ôì³·Ïú²Ù×÷/ÖØ×ö²Ù×÷µÄ·½·¨
-            //ÎªÁË½ÚÊ¡ä¯ÀÀÆ÷ÄÚ´æ¿Õ¼ä,undo/redoÖĞµÄ²Ù×÷»º´æÕ»,×î¶àÖ»¿É·Å40²½²Ù×÷;³¬¹ı40²½Ê±,½«×Ô¶¯É¾µô×î¾ÉµÄÒ»¸ö»º´æ
+            ///////////////ä»¥ä¸‹æ˜¯æ„é€ æ’¤é”€æ“ä½œ/é‡åšæ“ä½œçš„æ–¹æ³•
+            //ä¸ºäº†èŠ‚çœæµè§ˆå™¨å†…å­˜ç©ºé—´,undo/redoä¸­çš„æ“ä½œç¼“å­˜æ ˆ,æœ€å¤šåªå¯æ”¾40æ­¥æ“ä½œ;è¶…è¿‡40æ­¥æ—¶,å°†è‡ªåŠ¨åˆ æ‰æœ€æ—§çš„ä¸€ä¸ªç¼“å­˜
             this.pushOper = function (funcName, paras) {
                 var len = this.$undoStack.length;
                 if (this.$isUndo == 1) {
@@ -327,13 +328,13 @@ function GooFlow(bgDiv, property) {
                     this.$isUndo = 0;
                 }
             };
-            //½«Íâ²¿µÄ·½·¨¼ÓÈëµ½GooFlow¶ÔÏóµÄÊÂÎñ²Ù×÷¶ÑÕ»ÖĞ,ÔÚ¹ıºóµÄundo/redo²Ù×÷ÖĞ¿ÉÒÔ½øĞĞ¿ØÖÆ£¬Ò»°ãÓÃÓÚ¶ÔÁ÷³ÌÍ¼ÒÔÍâµÄ¸½¼ÓĞÅÏ¢½øĞĞ±à¼­µÄÊÂÎñ³·Ïú/ÖØ×ö¿ØÖÆ£»
-            //´«²ÎfuncÎªÒªÖ´ĞĞ·½·¨¶ÔÏó,jsonParaÎªÍâ²¿·½·¨½öÓĞµÄÒ»¸öÃæÏò×ÖÃæµÄJSON´«²Î,ÓÉJSON¶ÔÏó´øÈëËùÓĞÒª´«µÄĞÅÏ¢£»
-            //ÌáÊ¾:ÎªÁËÈÃÍâ²¿·½·¨ÄÜ¹»±»UNDO/REDO,ĞèÒªÔÚ±àĞ´ÕâĞ©Íâ²¿·½·¨ÊµÏÖÊ±,¼ÓÈë¶Ô¸Ã·½·¨Ö´ĞĞºóĞ§¹û»ØÍËµÄÁíÒ»¸öÖ´ĞĞ·½·¨µÄpushExternalOper
+            //å°†å¤–éƒ¨çš„æ–¹æ³•åŠ å…¥åˆ°GooFlowå¯¹è±¡çš„äº‹åŠ¡æ“ä½œå †æ ˆä¸­,åœ¨è¿‡åçš„undo/redoæ“ä½œä¸­å¯ä»¥è¿›è¡Œæ§åˆ¶ï¼Œä¸€èˆ¬ç”¨äºå¯¹æµç¨‹å›¾ä»¥å¤–çš„é™„åŠ ä¿¡æ¯è¿›è¡Œç¼–è¾‘çš„äº‹åŠ¡æ’¤é”€/é‡åšæ§åˆ¶ï¼›
+            //ä¼ å‚funcä¸ºè¦æ‰§è¡Œæ–¹æ³•å¯¹è±¡,jsonParaä¸ºå¤–éƒ¨æ–¹æ³•ä»…æœ‰çš„ä¸€ä¸ªé¢å‘å­—é¢çš„JSONä¼ å‚,ç”±JSONå¯¹è±¡å¸¦å…¥æ‰€æœ‰è¦ä¼ çš„ä¿¡æ¯ï¼›
+            //æç¤º:ä¸ºäº†è®©å¤–éƒ¨æ–¹æ³•èƒ½å¤Ÿè¢«UNDO/REDO,éœ€è¦åœ¨ç¼–å†™è¿™äº›å¤–éƒ¨æ–¹æ³•å®ç°æ—¶,åŠ å…¥å¯¹è¯¥æ–¹æ³•æ‰§è¡Œåæ•ˆæœå›é€€çš„å¦ä¸€ä¸ªæ‰§è¡Œæ–¹æ³•çš„pushExternalOper
             this.pushExternalOper = function (func, jsonPara) {
                 this.pushOper("externalFunc", [func, jsonPara]);
             };
-            //³·ÏúÉÏÒ»²½²Ù×÷
+            //æ’¤é”€ä¸Šä¸€æ­¥æ“ä½œ
             this.undo = function () {
                 if (this.$undoStack.length == 0)    return;
                 var tmp = this.$undoStack.pop();
@@ -342,7 +343,7 @@ function GooFlow(bgDiv, property) {
                     tmp[1][0](tmp[1][1]);
                 }
                 else {
-                    //´«²ÎµÄÊıÁ¿,×î¶àÖ§³Ö6¸ö.
+                    //ä¼ å‚çš„æ•°é‡,æœ€å¤šæ”¯æŒ6ä¸ª.
                     switch (tmp[1].length) {
                         case 0:
                             this[tmp[0]]();
@@ -368,7 +369,7 @@ function GooFlow(bgDiv, property) {
                     }
                 }
             };
-            //ÖØ×ö×î½üÒ»´Î±»³·ÏúµÄ²Ù×÷
+            //é‡åšæœ€è¿‘ä¸€æ¬¡è¢«æ’¤é”€çš„æ“ä½œ
             this.redo = function () {
                 if (this.$redoStack.length == 0)    return;
                 var tmp = this.$redoStack.pop();
@@ -377,7 +378,7 @@ function GooFlow(bgDiv, property) {
                     tmp[1][0](tmp[1][1]);
                 }
                 else {
-                    //´«²ÎµÄÊıÁ¿,×î¶àÖ§³Ö6¸ö.
+                    //ä¼ å‚çš„æ•°é‡,æœ€å¤šæ”¯æŒ6ä¸ª.
                     switch (tmp[1].length) {
                         case 0:
                             this[tmp[0]]();
@@ -405,11 +406,11 @@ function GooFlow(bgDiv, property) {
             };
         }
         $(document).keydown({inthis: this}, function (e) {
-            //°ó¶¨¼üÅÌ²Ù×÷
+            //ç»‘å®šé”®ç›˜æ“ä½œ
             var This = e.data.inthis;
             if (This.$focus == "")return;
             switch (e.keyCode) {
-                case 46://É¾³ı
+                case 46://åˆ é™¤
                     This.delNode(This.$focus, true);
                     This.delLine(This.$focus);
                     break;
@@ -438,7 +439,7 @@ GooFlow.prototype = {
     initDraw: function (id, width, height) {
         var elem;
 
-        this.$draw = document.createElementNS("http://www.w3.org/2000/svg", "svg");//¿É´´½¨´øÓĞÖ¸¶¨ÃüÃû¿Õ¼äµÄÔªËØ½Úµã
+        this.$draw = document.createElementNS("http://www.w3.org/2000/svg", "svg");//å¯åˆ›å»ºå¸¦æœ‰æŒ‡å®šå‘½åç©ºé—´çš„å…ƒç´ èŠ‚ç‚¹
         this.$workArea.prepend(this.$draw);
         var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
         this.$draw.appendChild(defs);
@@ -450,7 +451,7 @@ GooFlow.prototype = {
         this.$draw.id = id;
         this.$draw.style.width = width * 3 + "px";
         this.$draw.style.height = +height * 3 + "px";
-        //°ó¶¨Á¬ÏßµÄµã»÷Ñ¡ÖĞÒÔ¼°Ë«»÷±à¼­ÊÂ¼ş
+        //ç»‘å®šè¿çº¿çš„ç‚¹å‡»é€‰ä¸­ä»¥åŠåŒå‡»ç¼–è¾‘äº‹ä»¶
         var tmpClk = null;
         tmpClk = "g";
         if (this.$editable) {
@@ -490,11 +491,11 @@ GooFlow.prototype = {
         }
     },
     initGroup: function (width, height) {
-        this.$group = $("<div class='GooFlow_work_group' style='width:" + width * 3 + "px;height:" + height * 3 + "px'></div>");//´æ·Å±³¾°ÇøÓòµÄÈİÆ÷
+        this.$group = $("<div class='GooFlow_work_group' style='width:" + width * 3 + "px;height:" + height * 3 + "px'></div>");//å­˜æ”¾èƒŒæ™¯åŒºåŸŸçš„å®¹å™¨
         this.$workArea.prepend(this.$group);
         if (!this.$editable)    return;
-        //ÇøÓò»®·Ö¿ò²Ù×÷ÇøµÄÊÂ¼ş°ó¶¨
-        this.$group.on("mousedown", {inthis: this}, function (e) {//°ó¶¨RESIZE¹¦ÄÜÒÔ¼°ÒÆ¶¯¹¦ÄÜ
+        //åŒºåŸŸåˆ’åˆ†æ¡†æ“ä½œåŒºçš„äº‹ä»¶ç»‘å®š
+        this.$group.on("mousedown", {inthis: this}, function (e) {//ç»‘å®šRESIZEåŠŸèƒ½ä»¥åŠç§»åŠ¨åŠŸèƒ½
             if (e.button == 2)return false;
             var This = e.data.inthis;
             if (This.$nowType != "group")    return;
@@ -604,7 +605,7 @@ GooFlow.prototype = {
                 return false;
             }
         });
-        //°ó¶¨ĞŞ¸ÄÎÄ×ÖËµÃ÷¹¦ÄÜ
+        //ç»‘å®šä¿®æ”¹æ–‡å­—è¯´æ˜åŠŸèƒ½
         this.$group.on("dblclick", {inthis: this}, function (e) {
             var This = e.data.inthis;
             if (This.$nowType != "group")    return;
@@ -628,7 +629,7 @@ GooFlow.prototype = {
             });
             return false;
         });
-        //°ó¶¨µã»÷ÊÂ¼ş
+        //ç»‘å®šç‚¹å‡»äº‹ä»¶
         this.$group.mouseup({inthis: this}, function (e) {
 
             var This = e.data.inthis;
@@ -637,14 +638,14 @@ GooFlow.prototype = {
             switch ($(e.target).attr("class")) {
                 case "rs_close":
                     This.delArea(e.target.parentNode.parentNode.id);
-                    return false;//É¾³ı¸Ã·Ö×éÇøÓò
+                    return false;//åˆ é™¤è¯¥åˆ†ç»„åŒºåŸŸ
                 case "bg":
                     return;
             }
             switch (e.target.tagName) {
                 case "LABEL":
                     return false;
-                case "B"://°ó¶¨±äÉ«¹¦ÄÜ
+                case "B"://ç»‘å®šå˜è‰²åŠŸèƒ½
                     var id = e.target.parentNode.id;
                     switch (This.$areaData[id].color) {
                         case "red":
@@ -681,7 +682,7 @@ GooFlow.prototype = {
             }
         });
     },
-    //Ã¿Ò»ÖÖÀàĞÍ½áµã¼°Æä°´Å¥µÄËµÃ÷ÎÄ×Ö
+    //æ¯ä¸€ç§ç±»å‹ç»“ç‚¹åŠå…¶æŒ‰é’®çš„è¯´æ˜æ–‡å­—
     setNodeRemarks: function (remark) {
         this.$tool.children("a").each(function () {
             this.title = remark[$(this).attr("id").split("btn_")[1]];
@@ -689,7 +690,7 @@ GooFlow.prototype = {
         this.$nodeRemark = remark;
     },
 
-    //ÇĞ»»×ó±ß¹¤¾ßÀ¸°´Å¥,´«²ÎTYPE±íÊ¾ÇĞ»»³ÉÄÄÖÖÀàĞÍµÄ°´Å¥
+    //åˆ‡æ¢å·¦è¾¹å·¥å…·æ æŒ‰é’®,ä¼ å‚TYPEè¡¨ç¤ºåˆ‡æ¢æˆå“ªç§ç±»å‹çš„æŒ‰é’®
     switchToolBtn: function (type) {
         this.$tool.children("#" + this.$id + "_btn_" + this.$nowType.split(" ")[0]).attr("class", "GooFlow_tool_btn");
         if (this.$nowType == "group") {
@@ -705,7 +706,7 @@ GooFlow.prototype = {
         }
         if (this.$textArea.css("display") == "none")    this.$textArea.removeData("id").val("").hide();
     },
-    //Ôö¼ÓÒ»¸öÁ÷³Ì½áµã,´«²ÎÎªÒ»¸öJSON,ÓĞid,name,top,left,width,height,type(½áµãÀàĞÍ)µÈÊôĞÔ
+    //å¢åŠ ä¸€ä¸ªæµç¨‹ç»“ç‚¹,ä¼ å‚ä¸ºä¸€ä¸ªJSON,æœ‰id,name,top,left,width,height,type(ç»“ç‚¹ç±»å‹)ç­‰å±æ€§
     addNode: function (id, json) {
         if (this.onItemAdd != null && !this.onItemAdd(id, "node", json))return;
         if (this.$undoStack && this.$editable) {
@@ -732,16 +733,16 @@ GooFlow.prototype = {
         ++this.$nodeCount;
         if (this.$editable) {
             this.$nodeData[id].alt = true;
-            if (this.$deletedItem[id])    delete this.$deletedItem[id];//ÔÚ»ØÍËÉ¾³ı²Ù×÷Ê±,È¥µô¸ÃÔªËØµÄÉ¾³ı¼ÇÂ¼
+            if (this.$deletedItem[id])    delete this.$deletedItem[id];//åœ¨å›é€€åˆ é™¤æ“ä½œæ—¶,å»æ‰è¯¥å…ƒç´ çš„åˆ é™¤è®°å½•
         }
     },
     initWorkForNode: function () {
-        //°ó¶¨µã»÷ÊÂ¼ş
+        //ç»‘å®šç‚¹å‡»äº‹ä»¶
         this.$workArea.delegate(".GooFlow_item", "click", {inthis: this}, function (e) {
             e.data.inthis.focusItem(this.id, true);
             $(this).removeClass("item_mark");
         });
-        //°ó¶¨ÓÃÊó±êÒÆ¶¯ÊÂ¼ş
+        //ç»‘å®šç”¨é¼ æ ‡ç§»åŠ¨äº‹ä»¶
         this.$workArea.delegate(".ico", "mousedown", {inthis: this}, function (e) {
             if (!e)e = window.event;
             if (e.button == 2)return false;
@@ -797,7 +798,7 @@ GooFlow.prototype = {
             }
         });
         if (!this.$editable)    return;
-        //°ó¶¨Êó±ê¸²¸Ç/ÒÆ³öÊÂ¼ş
+        //ç»‘å®šé¼ æ ‡è¦†ç›–/ç§»å‡ºäº‹ä»¶
         this.$workArea.delegate(".GooFlow_item", "mouseenter", {inthis: this}, function (e) {
             if (e.data.inthis.$nowType != "direct")    return;
             $(this).addClass("item_mark");
@@ -806,7 +807,7 @@ GooFlow.prototype = {
             if (e.data.inthis.$nowType != "direct")    return;
             $(this).removeClass("item_mark");
         });
-        //°ó¶¨Á¬ÏßÊ±È·¶¨³õÊ¼µã
+        //ç»‘å®šè¿çº¿æ—¶ç¡®å®šåˆå§‹ç‚¹
         this.$workArea.delegate(".GooFlow_item", "mousedown", {inthis: this}, function (e) {
             if (e.button == 2)return false;
             var This = e.data.inthis;
@@ -819,7 +820,7 @@ GooFlow.prototype = {
             var line = GooFlow.prototype.drawLine("GooFlow_tmp_line", [X, Y], [X, Y], true, true);
             This.$draw.appendChild(line);
         });
-        //°ó¶¨Á¬ÏßÊ±È·¶¨½áÊøµã
+        //ç»‘å®šè¿çº¿æ—¶ç¡®å®šç»“æŸç‚¹
         this.$workArea.delegate(".GooFlow_item", "mouseup", {inthis: this}, function (e) {
             var This = e.data.inthis;
             if (This.$nowType != "direct")    return;
@@ -831,7 +832,7 @@ GooFlow.prototype = {
             });
             This.$max++;
         });
-        //°ó¶¨Ë«»÷±à¼­ÊÂ¼ş
+        //ç»‘å®šåŒå‡»ç¼–è¾‘äº‹ä»¶
         this.$workArea.delegate(".GooFlow_item > .span", "dblclick", {inthis: this}, function (e) {
             var oldTxt = this.innerHTML;
             var This = e.data.inthis;
@@ -866,13 +867,13 @@ GooFlow.prototype = {
                 This.$textArea.val("").removeData("id").hide();
             });
         });
-        //°ó¶¨½áµãµÄÉ¾³ı¹¦ÄÜ
+        //ç»‘å®šç»“ç‚¹çš„åˆ é™¤åŠŸèƒ½
         this.$workArea.delegate(".rs_close", "click", {inthis: this}, function (e) {
             if (!e)e = window.event;
             e.data.inthis.delNode(e.data.inthis.$focus);
             return false;
         });
-        //°ó¶¨½áµãµÄRESIZE¹¦ÄÜ
+        //ç»‘å®šç»“ç‚¹çš„RESIZEåŠŸèƒ½
         this.$workArea.delegate(".GooFlow_area > div > div[class!=rs_close]", "mousedown", {inthis: this}, function (e) {
             if (!e)e = window.event;
             if (e.button == 2)return false;
@@ -934,7 +935,7 @@ GooFlow.prototype = {
             }
         });
     },
-    //»ñÈ¡½áµã/Á¬Ïß/·Ö×éÇøÓòµÄÏêÏ¸ĞÅÏ¢
+    //è·å–ç»“ç‚¹/è¿çº¿/åˆ†ç»„åŒºåŸŸçš„è¯¦ç»†ä¿¡æ¯
     getItemInfo: function (id, type) {
         switch (type) {
             case "node":
@@ -945,7 +946,7 @@ GooFlow.prototype = {
                 return this.$areaData[id] || null;
         }
     },
-    //È¡ÏûËùÓĞ½áµã/Á¬Ïß±»Ñ¡¶¨µÄ×´Ì¬
+    //å–æ¶ˆæ‰€æœ‰ç»“ç‚¹/è¿çº¿è¢«é€‰å®šçš„çŠ¶æ€
     blurItem: function () {
         if (this.$focus != "") {
             var jq = $("#" + this.$focus);
@@ -968,18 +969,18 @@ GooFlow.prototype = {
         this.$focus = "";
         return true;
     },
-    //Ñ¡¶¨Ä³¸ö½áµã/×ª»»Ïß bool:TRUE¾ö¶¨ÁËÒª´¥·¢Ñ¡ÖĞÊÂ¼ş£¬FALSEÔò²»´¥·¢Ñ¡ÖĞÊÂ¼ş£¬¶àÓÃÔÚ³ÌĞòÄÚ²¿µ÷ÓÃ¡£
+    //é€‰å®šæŸä¸ªç»“ç‚¹/è½¬æ¢çº¿ bool:TRUEå†³å®šäº†è¦è§¦å‘é€‰ä¸­äº‹ä»¶ï¼ŒFALSEåˆ™ä¸è§¦å‘é€‰ä¸­äº‹ä»¶ï¼Œå¤šç”¨åœ¨ç¨‹åºå†…éƒ¨è°ƒç”¨ã€‚
     focusItem: function (id, bool) {
         var jq = $("#" + id);
         if (jq.length == 0)    return;
-        if (!this.blurItem())    return;//ÏÈÖ´ĞĞ"È¡ÏûÑ¡ÖĞ",Èç¹û·µ»ØFLASE,ÔòÒ²»á×èÖ¹Ñ¡¶¨ÊÂ¼ş¼ÌĞø½øĞĞ.
+        if (!this.blurItem())    return;//å…ˆæ‰§è¡Œ"å–æ¶ˆé€‰ä¸­",å¦‚æœè¿”å›FLASE,åˆ™ä¹Ÿä¼šé˜»æ­¢é€‰å®šäº‹ä»¶ç»§ç»­è¿›è¡Œ.
         if (jq.prop("tagName") == "DIV") {
             if (bool && this.onItemFocus != null && !this.onItemFocus(id, "node"))    return;
             jq.addClass("item_focus");
             if (this.$editable)jq.children("div:eq(0)").css("display", "block");
             this.$workArea.append(jq);
         }
-        else {//Èç¹ûÊÇÁ¬½ÓÏß
+        else {//å¦‚æœæ˜¯è¿æ¥çº¿
             if (this.onItemFocus != null && !this.onItemFocus(id, "line"))    return;
 
             jq[0].childNodes[1].setAttribute("stroke", "#ff3300");
@@ -1025,7 +1026,7 @@ GooFlow.prototype = {
         this.$focus = id;
         this.switchToolBtn("cursor");
     },
-    //ÒÆ¶¯½áµãµ½Ò»¸öĞÂµÄÎ»ÖÃ
+    //ç§»åŠ¨ç»“ç‚¹åˆ°ä¸€ä¸ªæ–°çš„ä½ç½®
     moveNode: function (id, left, top) {
         if (!this.$nodeData[id])    return;
         if (this.onItemMove != null && !this.onItemMove(id, "node", left, top))    return;
@@ -1038,16 +1039,16 @@ GooFlow.prototype = {
         $("#" + id).css({left: left + "px", top: top + "px"});
         this.$nodeData[id].left = left;
         this.$nodeData[id].top = top;
-        //ÖØ»­×ª»»Ïß
+        //é‡ç”»è½¬æ¢çº¿
         this.resetLines(id, this.$nodeData[id]);
         if (this.$editable) {
             this.$nodeData[id].alt = true;
         }
     },
-    //ÉèÖÃ½áµã/Á¬Ïß/·Ö×éÇøÓòµÄÎÄ×ÖĞÅÏ¢
+    //è®¾ç½®ç»“ç‚¹/è¿çº¿/åˆ†ç»„åŒºåŸŸçš„æ–‡å­—ä¿¡æ¯
     setName: function (id, name, type) {
         var oldName;
-        if (type == "node") {//Èç¹ûÊÇ½áµã
+        if (type == "node") {//å¦‚æœæ˜¯ç»“ç‚¹
             if (!this.$nodeData[id])    return;
             if (this.$nodeData[id].name == name)    return;
             if (this.onItemRename != null && !this.onItemRename(id, name, "node"))    return;
@@ -1069,10 +1070,10 @@ GooFlow.prototype = {
             if (this.$editable) {
                 this.$nodeData[id].alt = true;
             }
-            //ÖØ»­×ª»»Ïß
+            //é‡ç”»è½¬æ¢çº¿
             this.resetLines(id, this.$nodeData[id]);
         }
-        else if (type == "line") {//Èç¹ûÊÇÏß
+        else if (type == "line") {//å¦‚æœæ˜¯çº¿
             if (!this.$lineData[id])    return;
             if (this.$lineData[id].name == name)    return;
             if (this.onItemRename != null && !this.onItemRename(id, name, "line"))    return;
@@ -1085,7 +1086,7 @@ GooFlow.prototype = {
                 this.$lineData[id].alt = true;
             }
         }
-        else if (type == "area") {//Èç¹ûÊÇ·Ö×éÇøÓò
+        else if (type == "area") {//å¦‚æœæ˜¯åˆ†ç»„åŒºåŸŸ
             if (!this.$areaData[id])    return;
             if (this.$areaData[id].name == name)    return;
             if (this.onItemRename != null && !this.onItemRename(id, name, "area"))    return;
@@ -1101,7 +1102,7 @@ GooFlow.prototype = {
             this.pushOper("setName", paras);
         }
     },
-    //ÉèÖÃ½áµãµÄ³ß´ç,½öÖ§³Ö·Ç¿ªÊ¼/½áÊø½áµã
+    //è®¾ç½®ç»“ç‚¹çš„å°ºå¯¸,ä»…æ”¯æŒéå¼€å§‹/ç»“æŸç»“ç‚¹
     resizeNode: function (id, width, height) {
         if (!this.$nodeData[id])    return;
         if (this.onItemResize != null && !this.onItemResize(id, "node", width, height))    return;
@@ -1121,14 +1122,14 @@ GooFlow.prototype = {
         if (this.$editable) {
             this.$nodeData[id].alt = true;
         }
-        //ÖØ»­×ª»»Ïß
+        //é‡ç”»è½¬æ¢çº¿
         this.resetLines(id, this.$nodeData[id]);
     },
-    //É¾³ı½áµã
+    //åˆ é™¤ç»“ç‚¹
     delNode: function (id) {
         if (!this.$nodeData[id])    return;
         if (this.onItemDel != null && !this.onItemDel(id, "node"))    return;
-        //ÏÈÉ¾³ı¿ÉÄÜµÄÁ¬Ïß
+        //å…ˆåˆ é™¤å¯èƒ½çš„è¿çº¿
         for (var k in this.$lineData) {
             if (this.$lineData[k].from == id || this.$lineData[k].to == id) {
                 //this.$draw.removeChild(this.$lineDom[k]);
@@ -1137,7 +1138,7 @@ GooFlow.prototype = {
                 this.delLine(k);
             }
         }
-        //ÔÙÉ¾³ı½áµã±¾Éí
+        //å†åˆ é™¤ç»“ç‚¹æœ¬èº«
         if (this.$undoStack) {
             var paras = [id, this.$nodeData[id]];
             this.pushOper("addNode", paras);
@@ -1149,17 +1150,17 @@ GooFlow.prototype = {
         if (this.$focus == id)    this.$focus = "";
 
         if (this.$editable) {
-            //ÔÚ»ØÍËĞÂÔö²Ù×÷Ê±,Èç¹û½ÚµãIDÒÔthis.$id+"_node_"¿ªÍ·,Ôò±íÊ¾Îª±¾´Î±à¼­Ê±ĞÂ¼ÓÈëµÄ½Úµã,ÕâĞ©½ÚµãµÄÉ¾³ı²»ÓÃ¼ÓÈëµ½$deletedItemÖĞ
+            //åœ¨å›é€€æ–°å¢æ“ä½œæ—¶,å¦‚æœèŠ‚ç‚¹IDä»¥this.$id+"_node_"å¼€å¤´,åˆ™è¡¨ç¤ºä¸ºæœ¬æ¬¡ç¼–è¾‘æ—¶æ–°åŠ å…¥çš„èŠ‚ç‚¹,è¿™äº›èŠ‚ç‚¹çš„åˆ é™¤ä¸ç”¨åŠ å…¥åˆ°$deletedItemä¸­
             if (id.indexOf(this.$id + "_node_") < 0)
                 this.$deletedItem[id] = "node";
         }
     },
-    //ÉèÖÃÁ÷³ÌÍ¼µÄÃû³Æ
+    //è®¾ç½®æµç¨‹å›¾çš„åç§°
     setTitle: function (text) {
         this.$title = text;
         if (this.$head)    this.$head.children("label").attr("title", text).text(text);
     },
-    //ÔØÈëÒ»×éÊı¾İ
+    //è½½å…¥ä¸€ç»„æ•°æ®
     loadData: function (data) {
         var t = this.$editable;
         this.$editable = false;
@@ -1174,8 +1175,8 @@ GooFlow.prototype = {
         this.$editable = t;
         this.$deletedItem = {};
     },
-    //ÓÃAJAX·½Ê½£¬Ô¶³Ì¶ÁÈ¡Ò»×éÊı¾İ
-    //²ÎÊıparaÎªJSON½á¹¹£¬ÓëJQUERYÖĞ$.ajax()·½·¨µÄ´«²ÎÒ»Ñù
+    //ç”¨AJAXæ–¹å¼ï¼Œè¿œç¨‹è¯»å–ä¸€ç»„æ•°æ®
+    //å‚æ•°paraä¸ºJSONç»“æ„ï¼Œä¸JQUERYä¸­$.ajax()æ–¹æ³•çš„ä¼ å‚ä¸€æ ·
     loadDataAjax: function (para) {
         var This = this;
         $.ajax({
@@ -1193,7 +1194,7 @@ GooFlow.prototype = {
             }
         })
     },
-    //°Ñ»­ºÃµÄÕû¸öÁ÷³ÌÍ¼µ¼³öµ½Ò»¸ö±äÁ¿ÖĞ(ÆäÊµÒ²¿ÉÒÔÖ±½Ó·ÃÎÊGooFlow¶ÔÏóµÄ$nodeData,$lineData,$areaDataÕâÈı¸öJSONÊôĞÔ)
+    //æŠŠç”»å¥½çš„æ•´ä¸ªæµç¨‹å›¾å¯¼å‡ºåˆ°ä¸€ä¸ªå˜é‡ä¸­(å…¶å®ä¹Ÿå¯ä»¥ç›´æ¥è®¿é—®GooFlowå¯¹è±¡çš„$nodeData,$lineData,$areaDataè¿™ä¸‰ä¸ªJSONå±æ€§)
     exportData: function () {
         var ret = {
             title: this.$title,
@@ -1214,7 +1215,7 @@ GooFlow.prototype = {
         }
         return ret;
     },
-    //Ö»°Ñ±¾´Î±à¼­Á÷³ÌÍ¼ÖĞ×÷ÁË±ä¸ü(°üÀ¨ÔöÉ¾¸Ä)µÄÔªËØµ¼³öµ½Ò»¸ö±äÁ¿ÖĞ,ÒÔ·½±ãÓÃ»§Ã¿´Î±à¼­ÔØÈëµÄÁ÷³ÌÍ¼ºóÖ»»ñÈ¡±ä¸ü¹ıµÄÊı¾İ
+    //åªæŠŠæœ¬æ¬¡ç¼–è¾‘æµç¨‹å›¾ä¸­ä½œäº†å˜æ›´(åŒ…æ‹¬å¢åˆ æ”¹)çš„å…ƒç´ å¯¼å‡ºåˆ°ä¸€ä¸ªå˜é‡ä¸­,ä»¥æ–¹ä¾¿ç”¨æˆ·æ¯æ¬¡ç¼–è¾‘è½½å…¥çš„æµç¨‹å›¾ååªè·å–å˜æ›´è¿‡çš„æ•°æ®
     exportAlter: function () {
         var ret = {nodes: {}, lines: {}, areas: {}};
         for (var k1 in this.$nodeData) {
@@ -1235,7 +1236,7 @@ GooFlow.prototype = {
         ret.deletedItem = this.$deletedItem;
         return ret;
     },
-    //±ä¸üÔªËØµÄID,Ò»°ãÓÃÓÚ¿ìËÙ±£´æºó,½«ºóÌ¨·µ»ØĞÂÔªËØµÄID¸üĞÂµ½Ò³ÃæÖĞ;typeÎªÔªËØÀàĞÍ(½Úµã,Á¬Ïß,Çø¿é)
+    //å˜æ›´å…ƒç´ çš„ID,ä¸€èˆ¬ç”¨äºå¿«é€Ÿä¿å­˜å,å°†åå°è¿”å›æ–°å…ƒç´ çš„IDæ›´æ–°åˆ°é¡µé¢ä¸­;typeä¸ºå…ƒç´ ç±»å‹(èŠ‚ç‚¹,è¿çº¿,åŒºå—)
     transNewId: function (oldId, newId, type) {
         var tmp;
         switch (type) {
@@ -1262,7 +1263,7 @@ GooFlow.prototype = {
                 break;
         }
     },
-    //Çå¿Õ¹¤×÷Çø¼°ÒÑÔØÈëµÄÊı¾İ
+    //æ¸…ç©ºå·¥ä½œåŒºåŠå·²è½½å…¥çš„æ•°æ®
     clearData: function () {
         for (var key in this.$nodeData) {
             this.delNode(key);
@@ -1275,7 +1276,7 @@ GooFlow.prototype = {
         }
         this.$deletedItem = {};
     },
-    //Ïú»Ù×Ô¼º
+    //é”€æ¯è‡ªå·±
     destrory: function () {
         this.$bgDiv.empty();
         this.$lineData = null;
@@ -1289,8 +1290,8 @@ GooFlow.prototype = {
         this.$areaCount = 0;
         this.$deletedItem = {};
     },
-///////////ÒÔÏÂÎªÓĞ¹Ø»­ÏßµÄ·½·¨
-    //»æÖÆÒ»Ìõ¼ıÍ·Ïß£¬²¢·µ»ØÏßµÄDOM
+///////////ä»¥ä¸‹ä¸ºæœ‰å…³ç”»çº¿çš„æ–¹æ³•
+    //ç»˜åˆ¶ä¸€æ¡ç®­å¤´çº¿ï¼Œå¹¶è¿”å›çº¿çš„DOM
     drawLine: function (id, sp, ep, mark, dash) {
         var line;
         line = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -1337,7 +1338,7 @@ GooFlow.prototype = {
 
         return line;
     },
-    //»­Ò»ÌõÖ»ÓĞÁ½¸öÖĞµãµÄÕÛÏß
+    //ç”»ä¸€æ¡åªæœ‰ä¸¤ä¸ªä¸­ç‚¹çš„æŠ˜çº¿
     drawPoly: function (id, sp, m1, m2, ep, mark) {
         var poly, strPath;
         poly = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -1385,22 +1386,22 @@ GooFlow.prototype = {
 
         return poly;
     },
-    //¼ÆËãÁ½¸ö½áµã¼äÒªÁ¬Ö±ÏßµÄ»°£¬Á¬ÏßµÄ¿ªÊ¼×ø±êºÍ½áÊø×ø±ê
+    //è®¡ç®—ä¸¤ä¸ªç»“ç‚¹é—´è¦è¿ç›´çº¿çš„è¯ï¼Œè¿çº¿çš„å¼€å§‹åæ ‡å’Œç»“æŸåæ ‡
     calcStartEnd: function (n1, n2) {
         var X_1, Y_1, X_2, Y_2;
-        //XÅĞ¶Ï£º
+        //Xåˆ¤æ–­ï¼š
         var x11 = n1.left, x12 = n1.left + n1.width, x21 = n2.left, x22 = n2.left + n2.width;
-        //½áµã2ÔÚ½áµã1×ó±ß
+        //ç»“ç‚¹2åœ¨ç»“ç‚¹1å·¦è¾¹
         if (x11 >= x22) {
             X_1 = x11;
             X_2 = x22;
         }
-        //½áµã2ÔÚ½áµã1ÓÒ±ß
+        //ç»“ç‚¹2åœ¨ç»“ç‚¹1å³è¾¹
         else if (x12 <= x21) {
             X_1 = x12;
             X_2 = x21;
         }
-        //½áµã2ÔÚ½áµã1Ë®Æ½²¿·ÖÖØºÏ
+        //ç»“ç‚¹2åœ¨ç»“ç‚¹1æ°´å¹³éƒ¨åˆ†é‡åˆ
         else if (x11 <= x21 && x12 >= x21 && x12 <= x22) {
             X_1 = (x12 + x21) / 2;
             X_2 = X_1;
@@ -1418,19 +1419,19 @@ GooFlow.prototype = {
             X_2 = X_1;
         }
 
-        //YÅĞ¶Ï£º
+        //Yåˆ¤æ–­ï¼š
         var y11 = n1.top, y12 = n1.top + n1.height, y21 = n2.top, y22 = n2.top + n2.height;
-        //½áµã2ÔÚ½áµã1ÉÏ±ß
+        //ç»“ç‚¹2åœ¨ç»“ç‚¹1ä¸Šè¾¹
         if (y11 >= y22) {
             Y_1 = y11;
             Y_2 = y22;
         }
-        //½áµã2ÔÚ½áµã1ÏÂ±ß
+        //ç»“ç‚¹2åœ¨ç»“ç‚¹1ä¸‹è¾¹
         else if (y12 <= y21) {
             Y_1 = y12;
             Y_2 = y21;
         }
-        //½áµã2ÔÚ½áµã1´¹Ö±²¿·ÖÖØºÏ
+        //ç»“ç‚¹2åœ¨ç»“ç‚¹1å‚ç›´éƒ¨åˆ†é‡åˆ
         else if (y11 <= y21 && y12 >= y21 && y12 <= y22) {
             Y_1 = (y12 + y21) / 2;
             Y_2 = Y_1;
@@ -1449,21 +1450,21 @@ GooFlow.prototype = {
         }
         return {"start": [X_1, Y_1], "end": [X_2, Y_2]};
     },
-    //¼ÆËãÁ½¸ö½áµã¼äÒªÁ¬ÕÛÏßµÄ»°£¬Á¬ÏßµÄËùÓĞ×ø±ê
+    //è®¡ç®—ä¸¤ä¸ªç»“ç‚¹é—´è¦è¿æŠ˜çº¿çš„è¯ï¼Œè¿çº¿çš„æ‰€æœ‰åæ ‡
     calcPolyPoints: function (n1, n2, type, M) {
-        //¿ªÊ¼/½áÊøÁ½¸ö½áµãµÄÖĞĞÄ
+        //å¼€å§‹/ç»“æŸä¸¤ä¸ªç»“ç‚¹çš„ä¸­å¿ƒ
         var SP = {x: n1.left + n1.width / 2, y: n1.top + n1.height / 2};
         var EP = {x: n2.left + n2.width / 2, y: n2.top + n2.height / 2};
         var sp = [], m1 = [], m2 = [], ep = [];
-        //Èç¹ûÊÇÔÊĞíÖĞ¶Î¿É×óÓÒÒÆ¶¯µÄÕÛÏß,Ôò²ÎÊıMÎª¿ÉÒÆ¶¯ÖĞ¶ÎÏßµÄX×ø±ê
-        //´ÖÂÔ¼ÆËãÆğÊ¼µã
+        //å¦‚æœæ˜¯å…è®¸ä¸­æ®µå¯å·¦å³ç§»åŠ¨çš„æŠ˜çº¿,åˆ™å‚æ•°Mä¸ºå¯ç§»åŠ¨ä¸­æ®µçº¿çš„Xåæ ‡
+        //ç²—ç•¥è®¡ç®—èµ·å§‹ç‚¹
         sp = [SP.x, SP.y];
         ep = [EP.x, EP.y];
         if (type == "lr") {
-            //´ÖÂÔ¼ÆËã2¸öÖĞµã
+            //ç²—ç•¥è®¡ç®—2ä¸ªä¸­ç‚¹
             m1 = [M, SP.y];
             m2 = [M, EP.y];
-            //ÔÙ¾ßÌå·ÖÎöĞŞ¸Ä¿ªÊ¼µãºÍÖĞµã1
+            //å†å…·ä½“åˆ†æä¿®æ”¹å¼€å§‹ç‚¹å’Œä¸­ç‚¹1
             if (m1[0] > n1.left && m1[0] < n1.left + n1.width) {
                 m1[1] = (SP.y > EP.y ? n1.top : n1.top + n1.height);
                 sp[0] = m1[0];
@@ -1472,7 +1473,7 @@ GooFlow.prototype = {
             else {
                 sp[0] = (m1[0] < n1.left ? n1.left : n1.left + n1.width)
             }
-            //ÔÙ¾ßÌå·ÖÎöÖĞµã2ºÍ½áÊøµã
+            //å†å…·ä½“åˆ†æä¸­ç‚¹2å’Œç»“æŸç‚¹
             if (m2[0] > n2.left && m2[0] < n2.left + n2.width) {
                 m2[1] = (SP.y > EP.y ? n2.top + n2.height : n2.top);
                 ep[0] = m2[0];
@@ -1482,12 +1483,12 @@ GooFlow.prototype = {
                 ep[0] = (m2[0] < n2.left ? n2.left : n2.left + n2.width)
             }
         }
-        //Èç¹ûÊÇÔÊĞíÖĞ¶Î¿ÉÉÏÏÂÒÆ¶¯µÄÕÛÏß,Ôò²ÎÊıMÎª¿ÉÒÆ¶¯ÖĞ¶ÎÏßµÄY×ø±ê
+        //å¦‚æœæ˜¯å…è®¸ä¸­æ®µå¯ä¸Šä¸‹ç§»åŠ¨çš„æŠ˜çº¿,åˆ™å‚æ•°Mä¸ºå¯ç§»åŠ¨ä¸­æ®µçº¿çš„Yåæ ‡
         else if (type == "tb") {
-            //´ÖÂÔ¼ÆËã2¸öÖĞµã
+            //ç²—ç•¥è®¡ç®—2ä¸ªä¸­ç‚¹
             m1 = [SP.x, M];
             m2 = [EP.x, M];
-            //ÔÙ¾ßÌå·ÖÎöĞŞ¸Ä¿ªÊ¼µãºÍÖĞµã1
+            //å†å…·ä½“åˆ†æä¿®æ”¹å¼€å§‹ç‚¹å’Œä¸­ç‚¹1
             if (m1[1] > n1.top && m1[1] < n1.top + n1.height) {
                 m1[0] = (SP.x > EP.x ? n1.left : n1.left + n1.width);
                 sp[0] = m1[0];
@@ -1496,7 +1497,7 @@ GooFlow.prototype = {
             else {
                 sp[1] = (m1[1] < n1.top ? n1.top : n1.top + n1.height)
             }
-            //ÔÙ¾ßÌå·ÖÎöÖĞµã2ºÍ½áÊøµã
+            //å†å…·ä½“åˆ†æä¸­ç‚¹2å’Œç»“æŸç‚¹
             if (m2[1] > n2.top && m2[1] < n2.top + n2.height) {
                 m2[0] = (SP.x > EP.x ? n2.left + n2.width : n2.left);
                 ep[0] = m2[0];
@@ -1508,7 +1509,7 @@ GooFlow.prototype = {
         }
         return {start: sp, m1: m1, m2: m2, end: ep};
     },
-    //³õÊ¼»¯ÕÛÏßÖĞ¶ÎµÄX/Y×ø±ê,mType='rb'Ê±ÎªX×ø±ê,mType='tb'Ê±ÎªY×ø±ê
+    //åˆå§‹åŒ–æŠ˜çº¿ä¸­æ®µçš„X/Yåæ ‡,mType='rb'æ—¶ä¸ºXåæ ‡,mType='tb'æ—¶ä¸ºYåæ ‡
     getMValue: function (n1, n2, mType) {
         if (mType == "lr") {
             return (n1.left + n1.width / 2 + n2.left + n2.width / 2) / 2;
@@ -1517,20 +1518,20 @@ GooFlow.prototype = {
             return (n1.top + n1.height / 2 + n2.top + n2.height / 2) / 2;
         }
     },
-    //Ôö¼ÓÒ»ÌõÏß
+    //å¢åŠ ä¸€æ¡çº¿
     addLine: function (id, json) {
         if (this.onItemAdd != null && !this.onItemAdd(id, "line", json))return;
         if (this.$undoStack && this.$editable) {
             this.pushOper("delLine", [id]);
         }
-        var n1 = null, n2 = null;//»ñÈ¡¿ªÊ¼/½áÊø½áµãµÄÊı¾İ
+        var n1 = null, n2 = null;//è·å–å¼€å§‹/ç»“æŸç»“ç‚¹çš„æ•°æ®
         if (json.from == json.to)    return;
-        //±ÜÃâÁ½¸ö½Úµã¼ä²»ÄÜÓĞÒ»ÌõÒÔÉÏÍ¬Ïò½ÓÁ¬Ïß
+        //é¿å…ä¸¤ä¸ªèŠ‚ç‚¹é—´ä¸èƒ½æœ‰ä¸€æ¡ä»¥ä¸ŠåŒå‘æ¥è¿çº¿
         for (var k in this.$lineData) {
             if ((json.from == this.$lineData[k].from && json.to == this.$lineData[k].to))
                 return;
         }
-        var n1 = this.$nodeData[json.from], n2 = this.$nodeData[json.to];//»ñÈ¡¿ªÊ¼/½áÊø½áµãµÄÊı¾İ
+        var n1 = this.$nodeData[json.from], n2 = this.$nodeData[json.to];//è·å–å¼€å§‹/ç»“æŸç»“ç‚¹çš„æ•°æ®
         if (!n1 || !n2)    return;
         var res;
         if (json.type && json.type != "sl")
@@ -1543,7 +1544,7 @@ GooFlow.prototype = {
             this.$lineData[id].type = json.type;
             this.$lineData[id].M = json.M;
         }
-        else    this.$lineData[id].type = "sl";//Ä¬ÈÏÎªÖ±Ïß
+        else    this.$lineData[id].type = "sl";//é»˜è®¤ä¸ºç›´çº¿
         this.$lineData[id].from = json.from;
         this.$lineData[id].to = json.to;
         this.$lineData[id].name = json.name;
@@ -1571,15 +1572,15 @@ GooFlow.prototype = {
         ++this.$lineCount;
         if (this.$editable) {
             this.$lineData[id].alt = true;
-            if (this.$deletedItem[id])    delete this.$deletedItem[id];//ÔÚ»ØÍËÉ¾³ı²Ù×÷Ê±,È¥µô¸ÃÔªËØµÄÉ¾³ı¼ÇÂ¼
+            if (this.$deletedItem[id])    delete this.$deletedItem[id];//åœ¨å›é€€åˆ é™¤æ“ä½œæ—¶,å»æ‰è¯¥å…ƒç´ çš„åˆ é™¤è®°å½•
         }
     },
-    //ÖØ¹¹ËùÓĞÁ¬ÏòÄ³¸ö½áµãµÄÏßµÄÏÔÊ¾£¬´«²Î½á¹¹Îª$nodeDataÊı×éµÄÒ»¸öµ¥Ôª½á¹¹
+    //é‡æ„æ‰€æœ‰è¿å‘æŸä¸ªç»“ç‚¹çš„çº¿çš„æ˜¾ç¤ºï¼Œä¼ å‚ç»“æ„ä¸º$nodeDataæ•°ç»„çš„ä¸€ä¸ªå•å…ƒç»“æ„
     resetLines: function (id, node) {
         for (var i in this.$lineData) {
-            var other = null;//»ñÈ¡½áÊø/¿ªÊ¼½áµãµÄÊı¾İ
+            var other = null;//è·å–ç»“æŸ/å¼€å§‹ç»“ç‚¹çš„æ•°æ®
             var res;
-            if (this.$lineData[i].from == id) {//ÕÒ½áÊøµã
+            if (this.$lineData[i].from == id) {//æ‰¾ç»“æŸç‚¹
                 other = this.$nodeData[this.$lineData[i].to] || null;
                 if (other == null)    continue;
                 if (this.$lineData[i].type == "sl")
@@ -1588,7 +1589,7 @@ GooFlow.prototype = {
                     res = GooFlow.prototype.calcPolyPoints(node, other, this.$lineData[i].type, this.$lineData[i].M)
                 if (!res)    break;
             }
-            else if (this.$lineData[i].to == id) {//ÕÒ¿ªÊ¼µã
+            else if (this.$lineData[i].to == id) {//æ‰¾å¼€å§‹ç‚¹
                 other = this.$nodeData[this.$lineData[i].from] || null;
                 if (other == null)    continue;
                 if (this.$lineData[i].type == "sl")
@@ -1623,7 +1624,7 @@ GooFlow.prototype = {
 
         }
     },
-    //ÖØĞÂÉèÖÃÁ¬ÏßµÄÑùÊ½ newType= "sl":Ö±Ïß, "lr":ÖĞ¶Î¿É×óÓÒÒÆ¶¯ĞÍÕÛÏß, "tb":ÖĞ¶Î¿ÉÉÏÏÂÒÆ¶¯ĞÍÕÛÏß
+    //é‡æ–°è®¾ç½®è¿çº¿çš„æ ·å¼ newType= "sl":ç›´çº¿, "lr":ä¸­æ®µå¯å·¦å³ç§»åŠ¨å‹æŠ˜çº¿, "tb":ä¸­æ®µå¯ä¸Šä¸‹ç§»åŠ¨å‹æŠ˜çº¿
     setLineType: function (id, newType) {
         if (!newType || newType == null || newType == "" || newType == this.$lineData[id].type)    return false;
         if (this.onLineSetType != null && !this.onLineSetType(id, newType))    return;
@@ -1639,12 +1640,12 @@ GooFlow.prototype = {
         var to = this.$lineData[id].to;
         this.$lineData[id].type = newType;
         var res;
-        //Èç¹ûÊÇ±ä³ÉÕÛÏß
+        //å¦‚æœæ˜¯å˜æˆæŠ˜çº¿
         if (newType != "sl") {
             var res = GooFlow.prototype.calcPolyPoints(this.$nodeData[from], this.$nodeData[to], this.$lineData[id].type, this.$lineData[id].M);
             this.setLineM(id, this.getMValue(this.$nodeData[from], this.$nodeData[to], newType), true);
         }
-        //Èç¹ûÊÇ±ä»ØÖ±Ïß
+        //å¦‚æœæ˜¯å˜å›ç›´çº¿
         else {
             delete this.$lineData[id].M;
             this.$lineMove.hide().removeData("type").removeData("tid");
@@ -1666,7 +1667,7 @@ GooFlow.prototype = {
             this.$lineData[id].alt = true;
         }
     },
-    //ÉèÖÃÕÛÏßÖĞ¶ÎµÄX×ø±êÖµ£¨¿É×óÓÒÒÆ¶¯Ê±£©»òY×ø±êÖµ£¨¿ÉÉÏÏÂÒÆ¶¯Ê±£©
+    //è®¾ç½®æŠ˜çº¿ä¸­æ®µçš„Xåæ ‡å€¼ï¼ˆå¯å·¦å³ç§»åŠ¨æ—¶ï¼‰æˆ–Yåæ ‡å€¼ï¼ˆå¯ä¸Šä¸‹ç§»åŠ¨æ—¶ï¼‰
     setLineM: function (id, M, noStack) {
         if (!this.$lineData[id] || M < 0 || !this.$lineData[id].type || this.$lineData[id].type == "sl")    return false;
         if (this.onLineMove != null && !this.onLineMove(id, M))    return false;
@@ -1695,7 +1696,7 @@ GooFlow.prototype = {
             this.$lineData[id].alt = true;
         }
     },
-    //É¾³ı×ª»»Ïß
+    //åˆ é™¤è½¬æ¢çº¿
     delLine: function (id) {
         if (!this.$lineData[id])    return;
         if (this.onItemDel != null && !this.onItemDel(id, "node"))    return;
@@ -1709,14 +1710,14 @@ GooFlow.prototype = {
         if (this.$focus == id)    this.$focus = "";
         --this.$lineCount;
         if (this.$editable) {
-            //ÔÚ»ØÍËĞÂÔö²Ù×÷Ê±,Èç¹û½ÚµãIDÒÔthis.$id+"_line_"¿ªÍ·,Ôò±íÊ¾Îª±¾´Î±à¼­Ê±ĞÂ¼ÓÈëµÄ½Úµã,ÕâĞ©½ÚµãµÄÉ¾³ı²»ÓÃ¼ÓÈëµ½$deletedItemÖĞ
+            //åœ¨å›é€€æ–°å¢æ“ä½œæ—¶,å¦‚æœèŠ‚ç‚¹IDä»¥this.$id+"_line_"å¼€å¤´,åˆ™è¡¨ç¤ºä¸ºæœ¬æ¬¡ç¼–è¾‘æ—¶æ–°åŠ å…¥çš„èŠ‚ç‚¹,è¿™äº›èŠ‚ç‚¹çš„åˆ é™¤ä¸ç”¨åŠ å…¥åˆ°$deletedItemä¸­
             if (id.indexOf(this.$id + "_line_") < 0)
                 this.$deletedItem[id] = "line";
         }
         this.$lineOper.hide();
     },
-    //ÓÃÑÕÉ«±ê×¢/È¡Ïû±ê×¢Ò»¸ö½áµã»ò×ª»»Ïß£¬³£ÓÃÓÚÏÔÊ¾ÖØµã»òÁ÷³ÌµÄ½ø¶È¡£
-    //ÕâÊÇÒ»¸öÔÚ±à¼­Ä£Ê½ÖĞÎŞÓÃ,µ«ÊÇÔÚ´¿ä¯ÀÀÄ£Ê½ÖĞ·Ç³£ÓĞÓÃµÄ·½·¨£¬Êµ¼ÊÔËÓÃÖĞ¿ÉÓÃÓÚ¸ú×ÙÁ÷³ÌµÄ½ø¶È¡£
+    //ç”¨é¢œè‰²æ ‡æ³¨/å–æ¶ˆæ ‡æ³¨ä¸€ä¸ªç»“ç‚¹æˆ–è½¬æ¢çº¿ï¼Œå¸¸ç”¨äºæ˜¾ç¤ºé‡ç‚¹æˆ–æµç¨‹çš„è¿›åº¦ã€‚
+    //è¿™æ˜¯ä¸€ä¸ªåœ¨ç¼–è¾‘æ¨¡å¼ä¸­æ— ç”¨,ä½†æ˜¯åœ¨çº¯æµè§ˆæ¨¡å¼ä¸­éå¸¸æœ‰ç”¨çš„æ–¹æ³•ï¼Œå®é™…è¿ç”¨ä¸­å¯ç”¨äºè·Ÿè¸ªæµç¨‹çš„è¿›åº¦ã€‚
     markItem: function (id, type, mark) {
         if (type == "node") {
             if (!this.$nodeData[id])    return;
@@ -1744,7 +1745,7 @@ GooFlow.prototype = {
             this.pushOper("markItem", paras);
         }
     },
-    ////////////////////////ÒÔÏÂÎªÇøÓò·Ö×é¿é²Ù×÷
+    ////////////////////////ä»¥ä¸‹ä¸ºåŒºåŸŸåˆ†ç»„å—æ“ä½œ
     moveArea: function (id, left, top) {
         if (!this.$areaData[id])    return;
         if (this.onItemMove != null && !this.onItemMove(id, "area", left, top))    return;
@@ -1761,7 +1762,7 @@ GooFlow.prototype = {
             this.$areaData[id].alt = true;
         }
     },
-    //É¾³ıÇøÓò·Ö×é
+    //åˆ é™¤åŒºåŸŸåˆ†ç»„
     delArea: function (id) {
         if (!this.$areaData[id])    return;
         if (this.$undoStack) {
@@ -1774,12 +1775,12 @@ GooFlow.prototype = {
         delete this.$areaDom[id];
         --this.$areaCount;
         if (this.$editable) {
-            //ÔÚ»ØÍËĞÂÔö²Ù×÷Ê±,Èç¹û½ÚµãIDÒÔthis.$id+"_area_"¿ªÍ·,Ôò±íÊ¾Îª±¾´Î±à¼­Ê±ĞÂ¼ÓÈëµÄ½Úµã,ÕâĞ©½ÚµãµÄÉ¾³ı²»ÓÃ¼ÓÈëµ½$deletedItemÖĞ
+            //åœ¨å›é€€æ–°å¢æ“ä½œæ—¶,å¦‚æœèŠ‚ç‚¹IDä»¥this.$id+"_area_"å¼€å¤´,åˆ™è¡¨ç¤ºä¸ºæœ¬æ¬¡ç¼–è¾‘æ—¶æ–°åŠ å…¥çš„èŠ‚ç‚¹,è¿™äº›èŠ‚ç‚¹çš„åˆ é™¤ä¸ç”¨åŠ å…¥åˆ°$deletedItemä¸­
             if (id.indexOf(this.$id + "_area_") < 0)
                 this.$deletedItem[id] = "area";
         }
     },
-    //ÉèÖÃÇøÓò·Ö×éµÄÑÕÉ«
+    //è®¾ç½®åŒºåŸŸåˆ†ç»„çš„é¢œè‰²
     setAreaColor: function (id, color) {
         if (!this.$areaData[id])    return;
         if (this.$undoStack) {
@@ -1794,7 +1795,7 @@ GooFlow.prototype = {
             this.$areaData[id].alt = true;
         }
     },
-    //ÉèÖÃÇøÓò·Ö¿éµÄ³ß´ç
+    //è®¾ç½®åŒºåŸŸåˆ†å—çš„å°ºå¯¸
     resizeArea: function (id, width, height) {
         if (!this.$areaData[id])    return;
         if (this.onItemResize != null && !this.onItemResize(id, "area", width, height))    return;
@@ -1826,10 +1827,10 @@ GooFlow.prototype = {
         ++this.$areaCount;
         if (this.$editable) {
             this.$areaData[id].alt = true;
-            if (this.$deletedItem[id])    delete this.$deletedItem[id];//ÔÚ»ØÍËÉ¾³ı²Ù×÷Ê±,È¥µô¸ÃÔªËØµÄÉ¾³ı¼ÇÂ¼
+            if (this.$deletedItem[id])    delete this.$deletedItem[id];//åœ¨å›é€€åˆ é™¤æ“ä½œæ—¶,å»æ‰è¯¥å…ƒç´ çš„åˆ é™¤è®°å½•
         }
     },
-    //ÖØ¹¹Õû¸öÁ÷³ÌÍ¼Éè¼ÆÆ÷µÄ¿í¸ß
+    //é‡æ„æ•´ä¸ªæµç¨‹å›¾è®¾è®¡å™¨çš„å®½é«˜
     reinitSize: function (width, height) {
         var w = (width || 800) - 2;
         var h = (height || 500) - 2;
@@ -1854,7 +1855,7 @@ GooFlow.prototype = {
         }
     }
 }
-//½«´ËÀàµÄ¹¹Ôìº¯Êı¼ÓÈëÖÁJQUERY¶ÔÏóÖĞ
+//å°†æ­¤ç±»çš„æ„é€ å‡½æ•°åŠ å…¥è‡³JQUERYå¯¹è±¡ä¸­
 jQuery.extend({
     createGooFlow: function (bgDiv, property) {
         return new GooFlow(bgDiv, property);
