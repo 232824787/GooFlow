@@ -484,9 +484,15 @@ GooFlow.prototype = {
                 }).data("id", This.$focus).focus();
                 This.$workArea.parent().one("mousedown", function (e) {
                     if (e.button == 2)return false;
-                    This.setName(This.$textArea.data("id"), This.$textArea.val(), "line");
                     This.$textArea.val("").removeData("id").hide();
                 });
+                This.$textArea.keydown(function (e) {
+                    if (e.which == 13) {
+                        This.setName(This.$textArea.data("id"), This.$textArea.val(), "line");
+                        This.$textArea.val("").removeData("id").hide();
+                        $(this).unbind('keydown');
+                    }
+                })
             });
         }
     },
@@ -713,20 +719,20 @@ GooFlow.prototype = {
             this.pushOper("delNode", [id]);
         }
         var mark = json.mark ? " item_mark" : "";
-        if (json.type.indexOf(" round") < 0) {
-            if (!json.width || json.width < 26)json.width = 26;
-            if (!json.height || json.height < 24)json.height = 24;
-            if (!json.top || json.top < 0)json.top = 0;
-            if (!json.left || json.left < 0)json.left = 0;
-            var hack = 0;
-            this.$nodeDom[id] = $("<div class='GooFlow_item item_round" + mark + "' id='" + id + "' style='top:" + json.top + "px;left:" + json.left + "px'><table cellspacing='1' style='width:" + (json.width - 2) + "px;height:" + (json.height - 2) + "px;'><tr><td class='ico'><b class='ico_" + json.type + "'></b></td><td class='span'>" + json.name + "</td></tr></table><div style='display:none'><div class='rs_bottom'></div><div class='rs_right'></div><div class='rs_rb'></div><div class='rs_close'></div></div></div>");
-            if (json.type.indexOf(" mix") > -1)    this.$nodeDom[id].addClass("item_mix");
-        }
-        else {
-            json.width = 24;
-            json.height = 24;
-            this.$nodeDom[id] = $("<div class='GooFlow_item item_round" + mark + "' id='" + id + "' style='top:" + json.top + "px;left:" + json.left + "px'><table cellspacing='0'><tr><td class='ico'><b class='ico_" + json.type + "'></b></td></tr></table><div  style='display:none'><div class='rs_close'></div></div><div class='span'>" + json.name + "</div></div>");
-        }
+        //if (json.type.indexOf(" round") < 0) {
+        if (!json.width || json.width < 26)json.width = 26;
+        if (!json.height || json.height < 24)json.height = 24;
+        if (!json.top || json.top < 0)json.top = 0;
+        if (!json.left || json.left < 0)json.left = 0;
+        var hack = 0;
+        this.$nodeDom[id] = $("<div class='GooFlow_item item_round" + mark + "' id='" + id + "' style='top:" + json.top + "px;left:" + json.left + "px'><table cellspacing='1' style='width:" + (json.width - 2) + "px;height:" + (json.height - 2) + "px;'><tr><td class='ico'><b class='ico_" + json.type + "'></b></td><td class='span'>" + json.name + "</td></tr></table><div style='display:none'><div class='rs_bottom'></div><div class='rs_right'></div><div class='rs_rb'></div><div class='rs_close'></div></div></div>");
+        if (json.type.indexOf(" mix") > -1)    this.$nodeDom[id].addClass("item_mix");
+        //}
+        //else {
+        //    json.width = 24;
+        //    json.height = 24;
+        //    this.$nodeDom[id] = $("<div class='GooFlow_item item_round" + mark + "' id='" + id + "' style='top:" + json.top + "px;left:" + json.left + "px'><table cellspacing='0'><tr><td class='ico'><b class='ico_" + json.type + "'></b></td></tr></table><div  style='display:none'><div class='rs_close'></div></div><div class='span'>" + json.name + "</div></div>");
+        //}
 
         this.$workArea.append(this.$nodeDom[id]);
         this.$nodeData[id] = json;
@@ -833,39 +839,46 @@ GooFlow.prototype = {
             This.$max++;
         });
         //绑定双击编辑事件
-        this.$workArea.delegate(".GooFlow_item > .span", "dblclick", {inthis: this}, function (e) {
-            var oldTxt = this.innerHTML;
-            var This = e.data.inthis;
-            var id = this.parentNode.id;
-            var t = getElCoordinate(This.$workArea[0]);
-            This.$textArea.val(oldTxt).css({
-                display: "block", height: $(this).height(), width: 100,
-                left: t.left + This.$nodeData[id].left - This.$workArea[0].parentNode.scrollLeft - 24,
-                top: t.top + This.$nodeData[id].top - This.$workArea[0].parentNode.scrollTop + 26
-            })
-                .data("id", This.$focus).focus();
-            This.$workArea.parent().one("mousedown", function (e) {
-                if (e.button == 2)return false;
-                This.setName(This.$textArea.data("id"), This.$textArea.val(), "node");
-                This.$textArea.val("").removeData("id").hide();
-            });
-        });
+        //this.$workArea.delegate(".GooFlow_item > .ico + .span", "dblclick", {inthis: this}, function (e) {
+        //    var oldTxt = this.innerHTML;
+        //    var This = e.data.inthis;
+        //    var id = this.parentNode.id;
+        //    var t = getElCoordinate(This.$workArea[0]);
+        //    This.$textArea.val(oldTxt).css({
+        //            display: "block", height: $(this).height(), width: 100,
+        //            left: t.left + This.$nodeData[id].left - This.$workArea[0].parentNode.scrollLeft - 100,
+        //            top: t.top + This.$nodeData[id].top - This.$workArea[0].parentNode.scrollTop + 100
+        //        })
+        //        .data("id", This.$focus).focus();
+        //    This.$workArea.parent().one("mousedown", function (e) {
+        //        if (e.button == 2)return false;
+        //
+        //        This.setName(This.$textArea.data("id"), This.$textArea.val(), "node");
+        //        This.$textArea.val("").removeData("id").hide();
+        //    });
+        //});
         this.$workArea.delegate(".ico + td", "dblclick", {inthis: this}, function (e) {
             var oldTxt = this.innerHTML;
             var This = e.data.inthis;
             var id = $(this).parents(".GooFlow_item").attr("id");
             var t = getElCoordinate(This.$workArea[0]);
             This.$textArea.val(oldTxt).css({
-                display: "block", width: $(this).width() + 24, height: $(this).height(),
-                left: t.left - 10 + This.$nodeData[id].left - This.$workArea[0].parentNode.scrollLeft,
-                top: t.top + 26 + This.$nodeData[id].top - This.$workArea[0].parentNode.scrollTop
-            })
+                    display: "block", width: $(this).width() + 24, height: $(this).height(),
+                    left: t.left - 10 + This.$nodeData[id].left - This.$workArea[0].parentNode.scrollLeft - 28,
+                    top: t.top + 26 + This.$nodeData[id].top - This.$workArea[0].parentNode.scrollTop + 5
+                })
                 .data("id", This.$focus).focus();
             This.$workArea.parent().one("mousedown", function (e) {
                 if (e.button == 2)return false;
-                This.setName(This.$textArea.data("id"), This.$textArea.val(), "node");
                 This.$textArea.val("").removeData("id").hide();
             });
+            This.$textArea.keydown(function (e) {
+                if (e.which == 13) {
+                    This.setName(This.$textArea.data("id"), This.$textArea.val(), "node");
+                    This.$textArea.val("").removeData("id").hide();
+                    $(this).unbind('keydown');
+                }
+            })
         });
         //绑定结点的删除功能
         this.$workArea.delegate(".rs_close", "click", {inthis: this}, function (e) {
@@ -1048,30 +1061,30 @@ GooFlow.prototype = {
     //设置结点/连线/分组区域的文字信息
     setName: function (id, name, type) {
         var oldName;
+
         if (type == "node") {//如果是结点
             if (!this.$nodeData[id])    return;
             if (this.$nodeData[id].name == name)    return;
             if (this.onItemRename != null && !this.onItemRename(id, name, "node"))    return;
             oldName = this.$nodeData[id].name;
             this.$nodeData[id].name = name;
-            if (this.$nodeData[id].type.indexOf("round") > 1) {
-                this.$nodeDom[id].children(".span").text(name);
-            }
-            else {
-                this.$nodeDom[id].find("td:eq(1)").text(name);
-                var hack = 0;
+            //if (this.$nodeData[id].type.indexOf("round") > 1) {
+            //    this.$nodeDom[id].children(".span").text(name);alert(1);
+            //}
+            this.$nodeDom[id].find("td:eq(1)").text(name);
+            var hack = 0;
 
-                var width = this.$nodeDom[id].outerWidth();
-                var height = this.$nodeDom[id].outerHeight();
-                this.$nodeDom[id].children("table").css({width: width - 2 + "px", height: height - 2 + "px"});
-                this.$nodeData[id].width = width;
-                this.$nodeData[id].height = height;
-            }
+            var width = this.$nodeDom[id].outerWidth();
+            var height = this.$nodeDom[id].outerHeight();
+            this.$nodeDom[id].children("table").css({width: width - 2 + "px", height: height - 2 + "px"});
+            this.$nodeData[id].width = width;
+            this.$nodeData[id].height = height;
+
             if (this.$editable) {
                 this.$nodeData[id].alt = true;
             }
             //重画转换线
-            this.resetLines(id, this.$nodeData[id]);
+            //this.resetLines(id, this.$nodeData[id]);
         }
         else if (type == "line") {//如果是线
             if (!this.$lineData[id])    return;
@@ -1388,66 +1401,54 @@ GooFlow.prototype = {
     },
     //计算两个结点间要连直线的话，连线的开始坐标和结束坐标
     calcStartEnd: function (n1, n2) {
+        var x1 = n1.left + n1.width / 2, y1 = n1.top + n1.height / 2, x2 = n2.left + n2.width / 2, y2 = n2.top + n2.height / 2;
         var X_1, Y_1, X_2, Y_2;
-        //X判断：
-        var x11 = n1.left, x12 = n1.left + n1.width, x21 = n2.left, x22 = n2.left + n2.width;
-        //结点2在结点1左边
-        if (x11 >= x22) {
-            X_1 = x11;
-            X_2 = x22;
+        var r = 14;
+        if (x2 > x1) {
+            if (y1 === y2) {
+                X_1 = x1 + r
+                Y_1 = y1
+                X_2 = x2 - r;
+                Y_2 = y2;
+            } else {
+                var k = (y2 - y1) / (x2 - x1);
+                var d = Math.atan(k);
+                X_1 = x1 + r * Math.cos(d);
+                Y_1 = y1 + r * Math.sin(d);
+                X_2 = x2 - r * Math.cos(d);
+                Y_2 = y2 - r * Math.sin(d);
+            }
         }
-        //结点2在结点1右边
-        else if (x12 <= x21) {
-            X_1 = x12;
-            X_2 = x21;
+        if (x1 > x2) {
+            if (y1 === y2) {
+                X_1 = x1 - r
+                Y_1 = y1
+                X_2 = x2 + r;
+                Y_2 = y2;
+            } else {
+                var k = (y2 - y1) / (x2 - x1);
+                var d = Math.atan(k);
+                X_1 = x1 - r * Math.cos(d);
+                Y_1 = y1 - r * Math.sin(d);
+                X_2 = x2 + r * Math.cos(d);
+                Y_2 = y2 + r * Math.sin(d);
+            }
         }
-        //结点2在结点1水平部分重合
-        else if (x11 <= x21 && x12 >= x21 && x12 <= x22) {
-            X_1 = (x12 + x21) / 2;
-            X_2 = X_1;
-        }
-        else if (x11 >= x21 && x12 <= x22) {
-            X_1 = (x11 + x12) / 2;
-            X_2 = X_1;
-        }
-        else if (x21 >= x11 && x22 <= x12) {
-            X_1 = (x21 + x22) / 2;
-            X_2 = X_1;
-        }
-        else if (x11 <= x22 && x12 >= x22) {
-            X_1 = (x11 + x22) / 2;
-            X_2 = X_1;
+        if (x1 === x2) {
+            if (y1 > y2) {
+                X_1 = x1
+                Y_1 = y1 + r
+                X_2 = x2;
+                Y_2 = y2 - r
+
+            } else {
+                X_1 = x1
+                Y_1 = y1 - r
+                X_2 = x2;
+                Y_2 = y2 + r;
+            }
         }
 
-        //Y判断：
-        var y11 = n1.top, y12 = n1.top + n1.height, y21 = n2.top, y22 = n2.top + n2.height;
-        //结点2在结点1上边
-        if (y11 >= y22) {
-            Y_1 = y11;
-            Y_2 = y22;
-        }
-        //结点2在结点1下边
-        else if (y12 <= y21) {
-            Y_1 = y12;
-            Y_2 = y21;
-        }
-        //结点2在结点1垂直部分重合
-        else if (y11 <= y21 && y12 >= y21 && y12 <= y22) {
-            Y_1 = (y12 + y21) / 2;
-            Y_2 = Y_1;
-        }
-        else if (y11 >= y21 && y12 <= y22) {
-            Y_1 = (y11 + y12) / 2;
-            Y_2 = Y_1;
-        }
-        else if (y21 >= y11 && y22 <= y12) {
-            Y_1 = (y21 + y22) / 2;
-            Y_2 = Y_1;
-        }
-        else if (y11 <= y22 && y12 >= y22) {
-            Y_1 = (y11 + y22) / 2;
-            Y_2 = Y_1;
-        }
         return {"start": [X_1, Y_1], "end": [X_2, Y_2]};
     },
     //计算两个结点间要连折线的话，连线的所有坐标

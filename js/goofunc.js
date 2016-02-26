@@ -1,4 +1,4 @@
-//»ñÈ¡Ò»¸öDIVµÄ¾ø¶Ô×ø±ê(²»¶ÏÏòÒÑ¶¨Î»µÄ¸¸ÔªËØ±éÀú£¬Ö±µ½¸ùÔªËØ£©
+//è·å–ä¸€ä¸ªDIVçš„ç»å¯¹åæ ‡(ä¸æ–­å‘å·²å®šä½çš„çˆ¶å…ƒç´ éå†ï¼Œç›´åˆ°æ ¹å…ƒç´ ï¼‰
 function getElCoordinate(dom) {
     var t = dom.offsetTop;
     var l = dom.offsetLeft;
@@ -14,7 +14,7 @@ function getElCoordinate(dom) {
         left: l
     };
 }
-//¼æÈİ¸÷ÖÖä¯ÀÀÆ÷µÄ,»ñÈ¡Êó±êÕæÊµÎ»ÖÃ
+//å…¼å®¹å„ç§æµè§ˆå™¨çš„,è·å–é¼ æ ‡çœŸå®ä½ç½®
 function mousePosition(ev) {
     if (!ev) ev = window.event;
     if (ev.pageX || ev.pageY) {
@@ -25,14 +25,14 @@ function mousePosition(ev) {
         y: ev.clientY + document.documentElement.scrollTop - document.body.clientTop
     };
 }
-//¸øDATEÀàÌí¼ÓÒ»¸ö¸ñÊ½»¯Êä³ö×Ö´®µÄ·½·¨
+//ç»™DATEç±»æ·»åŠ ä¸€ä¸ªæ ¼å¼åŒ–è¾“å‡ºå­—ä¸²çš„æ–¹æ³•
 Date.prototype.format = function (format) {
     var o = {
         "M+": this.getMonth() + 1, //month
         "d+": this.getDate(),    //day
         "h+": this.getHours(),   //hour
         "m+": this.getMinutes(), //minute
-        "s+": this.getSeconds(), //second  ¡®
+        "s+": this.getSeconds(), //second  â€˜
         //quarter
         "q+": Math.floor((this.getMonth() + 3) / 3),
         "S": this.getMilliseconds() //millisecond
@@ -44,7 +44,7 @@ Date.prototype.format = function (format) {
                 ("00" + o[k]).substr(("" + o[k]).length));
     return format;
 }
-//JS]¸ù¾İ¸ñÊ½×Ö·û´®·ÖÎöÈÕÆÚ£¨MMÓë×Ô¶¯Æ¥ÅäÁ½Î»µÄ09ºÍÒ»Î»µÄ9£©
+//JS]æ ¹æ®æ ¼å¼å­—ç¬¦ä¸²åˆ†ææ—¥æœŸï¼ˆMMä¸è‡ªåŠ¨åŒ¹é…ä¸¤ä½çš„09å’Œä¸€ä½çš„9ï¼‰
 //alert(getDateFromFormat(sDate,sFormat));
 function getDateFromFormat(dateString, formatString) {
     var regDate = /\d+/g;
@@ -78,8 +78,8 @@ function getDateFromFormat(dateString, formatString) {
     }
     return date;
 }
-//»õ±Ò·ÖÎö³É¸¡µãÊı
-//alert(parseCurrency("£¤1,900,000.12"));
+//è´§å¸åˆ†ææˆæµ®ç‚¹æ•°
+//alert(parseCurrency("ï¿¥1,900,000.12"));
 function parseCurrency(currentString) {
     var regParser = /[\d\.]+/g;
     var matches = currentString.match(regParser);
@@ -95,9 +95,9 @@ function parseCurrency(currentString) {
     return parseFloat(result);
 }
 
-//½«#XXXXXXÑÕÉ«¸ñÊ½×ª»»ÎªRGB¸ñÊ½£¬²¢¸½¼ÓÉÏÍ¸Ã÷¶È
+//å°†#XXXXXXé¢œè‰²æ ¼å¼è½¬æ¢ä¸ºRGBæ ¼å¼ï¼Œå¹¶é™„åŠ ä¸Šé€æ˜åº¦
 function brgba(hex, opacity) {
-    if (!/#?\d+/g.test(hex)) return hex; //Èç¹ûÊÇ¡°red¡±¸ñÊ½µÄÑÕÉ«Öµ£¬Ôò²»×ª»»¡£//ÕıÔò´íÎó£¬²Î¿¼ºóÃæµÄPSÄÚÈİ
+    if (!/#?\d+/g.test(hex)) return hex; //å¦‚æœæ˜¯â€œredâ€æ ¼å¼çš„é¢œè‰²å€¼ï¼Œåˆ™ä¸è½¬æ¢ã€‚//æ­£åˆ™é”™è¯¯ï¼Œå‚è€ƒåé¢çš„PSå†…å®¹
     var h = hex.charAt(0) == "#" ? hex.substring(1) : hex,
         r = parseInt(h.substring(0, 2), 16),
         g = parseInt(h.substring(2, 4), 16),
@@ -106,7 +106,7 @@ function brgba(hex, opacity) {
     return "rgba(" + r + "," + g + "," + b + "," + a + ")";
 }
 
-//½«ÖĞÎÄ×ª»»Îªutf-8
+//å°†ä¸­æ–‡è½¬æ¢ä¸ºutf-8
 function ch(s1) {
     var s = escape(s1);
 

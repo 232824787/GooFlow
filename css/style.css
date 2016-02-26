@@ -265,6 +265,14 @@ v\:group, v\:rect, v\:imagedata, v\:oval, v\:line, v\:polyline, v\:stroke, v\:te
     background: url(../img/gooflow_bullet.png) no-repeat 1px -50px
 }
 
+path {
+    stroke: rgba(0, 0, 0, 0.3) !important;
+}
+
+marker path {
+    fill: rgba(0, 0, 0, 0.3) !important;
+}
+
 .GooFlow_work svg {
     display: block;
     position: absolute
@@ -347,6 +355,14 @@ v\:group, v\:rect, v\:imagedata, v\:oval, v\:line, v\:polyline, v\:stroke, v\:te
     height: 22px
 }
 
+.ico + .span {
+    background: rgba(0, 100, 121, 0.45);
+    color: white;
+    top: 30px !important;
+    position: absolute;
+    padding: 3px 0 !important;
+    box-shadow: 0 0 1px 1px #ccc;
+}
 .node_title {
     position: absolute;
     top: 26px;
